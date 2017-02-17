@@ -44,7 +44,7 @@ You can also reach me on [Twitter][twitter] for further discussion.
 
 Apache License 2.0 © [Axel Isouard][author]
 
-[w3c-spec]:https://www.w3.org/TR/webrtc
+[w3c-spec]:https://www.w3.org/TR/2016/WD-webrtc-20161124/
 [webrtc-native]:https://webrtc.org/native-code
 [twitter]:https://twitter.com/aisouard
 [author]:https://axel.isouard.fr
