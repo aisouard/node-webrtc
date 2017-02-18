@@ -1,0 +1,43 @@
+{
+  "name": "webrtc",
+  "version": "0.0.1",
+  "description": "Native implementation of the W3C WebRTC specification for Node, using the Google's WebRTC native library.",
+  "homepage": "https://axel.isouard.fr/node-webrtc",
+  "author": "Axel Isouard <axel@isouard.fr>",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aisouard/node-webrtc.git"
+  },
+  "keywords": [
+    "webrtc",
+    "w3c"
+  ],
+  "bugs": {
+    "url": "https://github.com/aisouard/node-webrtc/issues"
+  },
+  "releases": {
+    "url": "https://github.com/aisouard/node-webrtc/releases/download"
+  },
+  "libwebrtc": {
+    "url": "https://github.com/aisouard/libwebrtc/releases/download",
+    "version": "0.0.1-rc.4"
+  },
+  "scripts": {
+    "build": "node-gyp build --debug",
+    "configure": "node-gyp configure",
+    "lint": "python scripts/cpplint.py --root=src src/*",
+    "install": "node scripts/fetch.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "download": "^5.0.3",
+    "npm": "^4.2.0"
+  },
+  "devDependencies": {
+    "nan": "^2.5.1",
+    "node-gyp": "^3.5.0"
+  },
+  "license": "Apache-2.0"
+}
