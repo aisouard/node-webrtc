@@ -1,16 +1,27 @@
 os: Visual Studio 2015
 
+environment:
+  matrix:
+    - nodejs_version: 6
+
 platform:
   - x64
 
 configuration: Release
 
-clone_folder: c:\projects\node-webrtc
-
-build_script:
-  - cd c:\projects\node-webrtc
+install:
+  - ps: Install-Product node $env:nodejs_version $env:Platform
+  - ps: Set-ExecutionPolicy Unrestricted -Scope CurrentUser -Force
+  - node --version
+  - npm --version
+  - node -e "console.log(process.arch);"
+  - IF /I "%PLATFORM%" == "x64" SET PATH=C:\Python27-x64;%PATH%
+  - IF /I "%PLATFORM%" == "x86" SET PATH=C:\python27;%PATH%
+  - IF /I "%PLATFORM%" == "x64" CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  - IF /I "%PLATFORM%" == "x86" CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86
   - npm install
+  - npm test
 
-test: OFF
-
-deploy: OFF
+build: off
+test: off
+deploy: off
