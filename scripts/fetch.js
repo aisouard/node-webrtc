@@ -4,14 +4,13 @@ const download = require('download');
 const exec = require('child_process').exec;
 const fs = require('fs');
 const npm = require('npm');
-const os = require('os');
 
 const PACKAGE_URL = process.env.npm_package_releases_url;
 const PACKAGE_VERSION = process.env.npm_package_version;
 
 function getModuleName() {
-  const platform = os.platform();
-  const arch = os.arch();
+  const platform = process.platform;
+  const arch = process.arch;
   const nodever = process.version;
 
   return `webrtc-${PACKAGE_VERSION}-node-${nodever}-${platform}-${arch}`;
@@ -30,7 +29,7 @@ function loadModule() {
 
 function fetchModule() {
   const moduleName = getModuleName();
-  const suffix = os.platform() === 'win' ? '.zip' : '.tar.gz';
+  const suffix = process.platform === 'win' ? '.zip' : '.tar.gz';
 
   console.log(`Downloading ${moduleName}${suffix}...`);
   download(`${PACKAGE_URL}/${PACKAGE_VERSION}/${moduleName}${suffix}`, 'build')
@@ -45,8 +44,8 @@ function fetchModule() {
 function fetchLibWebRTC() {
   const url = process.env.npm_package_libwebrtc_url;
   const version = process.env.npm_package_libwebrtc_version;
-  const platform = os.platform() === 'darwin' ? 'mac' : os.platform();
-  const fileName = `libwebrtc-${version}-${platform}-${os.arch()}`;
+  const platform = process.platform === 'darwin' ? 'mac' : process.platform;
+  const fileName = `libwebrtc-${version}-${platform}-${process.arch}`;
   const suffix = platform === 'win' ? '.zip' : '.tar.gz';
 
   if (fs.existsSync(`build/${fileName}${suffix}`)) {
@@ -67,7 +66,7 @@ function fetchLibWebRTC() {
 function extractPackage(fileName) {
   console.log(`Extracting ${fileName}...`);
 
-  if (os.platform() === 'win') {
+  if (process.platform === 'win') {
     return;
   }
 
