@@ -142,6 +142,7 @@ describe('RTCSessionDescription', () => {
     sessionDescription.type = 'answer';
     sessionDescription.sdp = 'invalid-sdp';
 
+    assert.strictEqual(Object.keys(sessionDescription).length, 2);
     assert.strictEqual(sessionDescription.type, sdp.type);
     assert.strictEqual(sessionDescription.sdp, sdp.sdp);
   });
