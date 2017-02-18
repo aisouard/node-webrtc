@@ -3,4 +3,5 @@
 // Definitions by: Axel Isouard <axel@isouard.fr>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
+/// <reference path="lib/RTCIceCandidate.d.ts" />
 /// <reference path="lib/RTCSessionDescription.d.ts" />
