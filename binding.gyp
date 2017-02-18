@@ -19,9 +19,6 @@
                         'WEBRTC_POSIX',
                         '_GLIBCXX_USE_CXX11_ABI=0',
                     ],
-                    'cflags_cc': [
-                        '-std=c++11',
-                    ],
                     'link_settings': {
                         'libraries': [
                             '-lwebrtc',
@@ -29,6 +26,9 @@
                     },
                 }],
                 ['OS=="linux"', {
+                    'cflags_cc': [
+                        '-std=c++11',
+                    ],
                     'link_settings': {
                         'libraries': [
                             '<!@(pkg-config --libs sm)',
@@ -40,6 +40,16 @@
                     },
                 }],
                 ['OS=="mac"', {
+                    'xcode_settings': {
+                        'OTHER_CPLUSPLUSFLAGS': [
+                            '-std=c++11',
+                            '-stdlib=libc++'
+                        ],
+                        'OTHER_LDFLAGS': [
+                            '-stdlib=libc++'
+                        ],
+                        'MACOSX_DEPLOYMENT_TARGET': '10.7',
+                    },
                     'link_settings': {
                         'libraries': [
                             '$(SDKROOT)/System/Library/Frameworks/AudioToolbox.framework',
