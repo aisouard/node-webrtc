@@ -29,7 +29,7 @@
     "configure": "node-gyp configure",
     "lint": "python scripts/cpplint.py --root=src src/*",
     "install": "node scripts/fetch.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "dependencies": {
     "bindings": "^1.2.1",
@@ -40,6 +40,8 @@
     "npm": "^4.2.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
     "nan": "^2.5.1",
     "node-gyp": "^3.5.0"
   },
