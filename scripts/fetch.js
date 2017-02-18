@@ -45,8 +45,9 @@ function fetchModule() {
 function fetchLibWebRTC() {
   const url = process.env.npm_package_libwebrtc_url;
   const version = process.env.npm_package_libwebrtc_version;
-  const fileName = `libwebrtc-${version}-${os.platform()}-${os.arch()}`;
-  const suffix = os.platform() === 'win' ? '.zip' : '.tar.gz';
+  const platform = os.platform() === 'darwin' ? 'mac' : os.platform();
+  const fileName = `libwebrtc-${version}-${platform}-${os.arch()}`;
+  const suffix = platform === 'win' ? '.zip' : '.tar.gz';
 
   if (fs.existsSync(`build/${fileName}${suffix}`)) {
     extractPackage(`./build/${fileName}${suffix}`);

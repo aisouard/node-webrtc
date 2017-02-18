@@ -9,6 +9,9 @@
                 'build/include',
                 '<!(node -e "require(\'nan\')")',
             ],
+            'library_dirs': [
+                '../build/lib',
+            ],
             'conditions': [
                 ['os_posix==1', {
                     'defines': [
@@ -19,9 +22,6 @@
                         '-std=c++11',
                     ],
                     'link_settings': {
-                        'ldflags': [
-                            '-Lbuild/lib',
-                        ],
                         'libraries': [
                             '-lwebrtc',
                         ],
@@ -57,7 +57,7 @@
                     ],
                     'link_settings': {
                         'libraries': [
-                            '-lbuild/lib/webrtc.lib',
+                            '-l../build/lib/webrtc.lib',
                             '-lmsdmo.lib',
                             '-lwmcodecdspuuid.lib',
                             '-ldmoguids.lib',
