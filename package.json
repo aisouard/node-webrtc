@@ -5,6 +5,7 @@
   "homepage": "https://axel.isouard.fr/node-webrtc",
   "author": "Axel Isouard <axel@isouard.fr>",
   "main": "index.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aisouard/node-webrtc.git"
