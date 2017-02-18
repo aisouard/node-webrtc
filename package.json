@@ -33,6 +33,9 @@
   },
   "dependencies": {
     "bindings": "^1.2.1",
+    "decompress": "^4.0.0",
+    "decompress-targz": "^4.0.0",
+    "decompress-unzip": "^4.0.1",
     "download": "^5.0.3",
     "npm": "^4.2.0"
   },

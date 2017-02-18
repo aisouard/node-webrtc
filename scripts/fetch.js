@@ -1,7 +1,7 @@
 'use strict';
 
+const decompress = require('decompress');
 const download = require('download');
-const exec = require('child_process').exec;
 const fs = require('fs');
 const npm = require('npm');
 
@@ -64,21 +64,25 @@ function fetchLibWebRTC() {
 }
 
 function extractPackage(fileName) {
+  let plugins = [];
+
   console.log(`Extracting ${fileName}...`);
 
-  if (process.platform === 'win') {
-    return;
+  if (process.platform === 'win32') {
+    plugins.push(require('decompress-unzip')());
+  } else {
+    plugins.push(require('decompress-targz')());
   }
 
-  exec(`tar xf ${fileName} -C build`, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`exec error: ${error}`);
-      process.exit(1);
-      return;
-    }
-
+  decompress(fileName, 'build', {
+    plugins: plugins
+  }).then(() => {
+    console.log('Done.');
     fs.unlinkSync(fileName);
     buildModule();
+  }).catch((err) => {
+    console.error('Failed.', err);
+    process.exit(1);
   });
 }
 
