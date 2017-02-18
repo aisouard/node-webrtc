@@ -29,7 +29,7 @@ function loadModule() {
 
 function fetchModule() {
   const moduleName = getModuleName();
-  const suffix = process.platform === 'win' ? '.zip' : '.tar.gz';
+  const suffix = process.platform === 'win32' ? '.zip' : '.tar.gz';
 
   console.log(`Downloading ${moduleName}${suffix}...`);
   download(`${PACKAGE_URL}/${PACKAGE_VERSION}/${moduleName}${suffix}`, 'build')
@@ -46,7 +46,7 @@ function fetchLibWebRTC() {
   const version = process.env.npm_package_libwebrtc_version;
   const platform = process.platform === 'darwin' ? 'mac' : process.platform;
   const fileName = `libwebrtc-${version}-${platform}-${process.arch}`;
-  const suffix = platform === 'win' ? '.zip' : '.tar.gz';
+  const suffix = process.platform === 'win32' ? '.zip' : '.tar.gz';
 
   if (fs.existsSync(`build/${fileName}${suffix}`)) {
     extractPackage(`./build/${fileName}${suffix}`);
