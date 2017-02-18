@@ -1,0 +1,16 @@
+os: Visual Studio 2015
+
+platform:
+  - x64
+
+configuration: Release
+
+clone_folder: c:\projects\node-webrtc
+
+build_script:
+  - cd c:\projects\node-webrtc
+  - npm install
+
+test: OFF
+
+deploy: OFF
