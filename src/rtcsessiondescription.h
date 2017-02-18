@@ -14,11 +14,33 @@
  * limitations under the License.
  */
 
+#ifndef RTCSESSIONDESCRIPTION_H_
+#define RTCSESSIONDESCRIPTION_H_
+
 #include <nan.h>
-#include "rtcsessiondescription.h"
+#include <webrtc/api/jsep.h>
+#include <string>
 
-NAN_MODULE_INIT(Init) {
-  RTCSessionDescription::Init(target);
-}
+using namespace v8;
 
-NODE_MODULE(webrtc, Init)
+class RTCSessionDescription : public Nan::ObjectWrap {
+ public:
+  static NAN_MODULE_INIT(Init);
+
+ private:
+  explicit RTCSessionDescription(
+      webrtc::SessionDescriptionInterface *sessionDescription);
+  ~RTCSessionDescription();
+
+  static NAN_METHOD(New);
+
+  static NAN_GETTER(GetType);
+  static NAN_GETTER(GetSdp);
+
+  static Nan::Persistent<FunctionTemplate> constructor;
+
+ protected:
+  webrtc::SessionDescriptionInterface *_sessionDescription;
+};
+
+#endif  // RTCSESSIONDESCRIPTION_H_
