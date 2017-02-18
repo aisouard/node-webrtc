@@ -24,7 +24,8 @@
     "version": "0.0.1-rc.4"
   },
   "scripts": {
-    "build": "node-gyp build --debug",
+    "build": "node-gyp build",
+    "build-debug": "node-gyp build --debug",
     "configure": "node-gyp configure",
     "lint": "python scripts/cpplint.py --root=src src/*",
     "install": "node scripts/fetch.js",
