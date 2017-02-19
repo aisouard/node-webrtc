@@ -203,27 +203,111 @@ describe('RTCIceCandidate', () => {
     });
 
     describe('protocol', () => {
-      const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+      it('should throw an error if protocol is missing', () => {
+        const foundation = 'candidate:123456789 1 1234567891 ' +
+          ipv6 + ' 12345 typ host tcptype active generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
 
-      it('should have the same value as passed in the constructor', () => {
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Expects at least 8 fields.');
+      });
+
+      it('should be equal to tcp if tcp is set in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ host tcptype active generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.protocol, 'tcp');
+      });
+
+      it('should be equal to udp if udp is set in foundation', () => {
+        const foundation = 'candidate:123456789 1 udp 1234567891 ' +
+          ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.protocol, 'udp');
       });
 
+      it('should throw an error if protocol is invalid in foundation', () => {
+        const foundation = 'candidate:123456789 1 sctp 1234567891 ' +
+          ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Unsupported transport type.');
+      });
+
       it('should be read-only', () => {
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
         iceCandidate.protocol = 'tcp';
         assert.strictEqual(iceCandidate.protocol, 'udp');
       });
     });
 
     describe('port', () => {
-      const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+      it('should throw an error if port is missing', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
 
-      it('should have the same value as passed in the constructor', () => {
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Expects at least 8 fields.');
+      });
+
+      it('should throw an error if port is invalid', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' -- typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Invalid value: --.');
+      });
+
+      it('should be 0 if port is set to 0 in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 0 typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.port, 0);
+      });
+
+      it('should be 12345 if port is set to 12345 in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.port, 12345);
       });
 
+      it('should be 65531 if rport is set to -5 in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' -5 typ relay generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.port, 65531);
+      });
+
       it('should be read-only', () => {
-        iceCandidate.port = 8500;
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ relay generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        iceCandidate.port = 32555;
         assert.strictEqual(iceCandidate.port, 12345);
       });
     });
@@ -231,8 +315,62 @@ describe('RTCIceCandidate', () => {
     describe('type', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
 
-      it('should have the same value as passed in the constructor', () => {
+      it('should throw an error if typ is missing', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Unsupported candidate type.');
+      });
+
+      it('should throw an error if typ is invalid', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ invalid generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+
+        assert.throws(() => {
+          new RTCIceCandidate(dummyIceCandidate(foundation));
+        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
+          'Unsupported candidate type.');
+      });
+
+      it('should be local if typ is set to host in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.type, 'local');
+      });
+
+      it('should be stun if typ is set to srflx in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ srflx generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.type, 'stun');
+      });
+
+      it('should be prflx if typ is set to prflx in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ prflx generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.type, 'prflx');
+      });
+
+      it('should be relay if typ is set to relay in foundation', () => {
+        const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
+          ipv6 + ' 12345 typ relay generation 0 ufrag ABCD ' +
+          'network-id 4 network-cost 50';
+        const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
+        assert.strictEqual(iceCandidate.type, 'relay');
       });
 
       it('should be read-only', () => {
@@ -431,16 +569,45 @@ describe('RTCIceCandidate', () => {
   });
 
   describe('serializer', () => {
-    let iceCandidate = new RTCIceCandidate(dummyIceCandidate());
-    const initializer = JSON.parse(JSON.stringify(iceCandidate));
-
     it('should have the same properties as set in the constructor', () => {
+      let iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+      const initializer = JSON.parse(JSON.stringify(iceCandidate));
+
       assert.strictEqual(initializer.candidate, udpFoundation);
       assert.strictEqual(initializer.sdpMid, 'data');
       assert.strictEqual(initializer.sdpMLineIndex, 0);
     });
 
+    it('should have sdpMid set to null if missing in the constructor', () => {
+      let iceCandidate = new RTCIceCandidate({
+        candidate: newCandidate, sdpMLineIndex: 1
+      });
+
+      const initializer = JSON.parse(JSON.stringify(iceCandidate));
+
+      assert.strictEqual(initializer.candidate, newCandidate);
+      assert.isNull(initializer.sdpMid);
+      assert.strictEqual(initializer.sdpMLineIndex, 1);
+    });
+
+    it('should have sdpMLineIndex set to 0 if missing in the constructor',
+      () => {
+        let iceCandidate = new RTCIceCandidate({
+          candidate: newCandidate, sdpMid: 'data'
+        });
+
+        const initializer = JSON.parse(JSON.stringify(iceCandidate));
+
+        assert.strictEqual(initializer.candidate, newCandidate);
+        assert.strictEqual(initializer.sdpMid, 'data');
+        assert.strictEqual(initializer.sdpMLineIndex, 0);
+      }
+    );
+
     it('should have 3 properties', () => {
+      let iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+      const initializer = JSON.parse(JSON.stringify(iceCandidate));
+
       assert.strictEqual(Object.keys(iceCandidate).length, 3);
     });
   });
