@@ -5,7 +5,7 @@ const assert = chai.assert;
 const RTCIceCandidate = require('../').RTCIceCandidate;
 
 let ipv6 = '0:1111:222:3333:4444:5555:6666:7777';
-if (process.platform == 'darwin') {
+if (process.platform == 'darwin' || process.platform == 'win32') {
   ipv6 = '::1111:222:3333:4444:5555:6666:7777';
 }
 
@@ -51,18 +51,22 @@ describe('RTCIceCandidate', () => {
         new RTCIceCandidate(26);
       }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
         'parameter 1 (\'candidateInitDict\') is not an object.');
+
       assert.throws(() => {
         new RTCIceCandidate('another string');
       }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
         'parameter 1 (\'candidateInitDict\') is not an object.');
+
       assert.throws(() => {
         new RTCIceCandidate({});
       }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
         'The \'candidate\' property is not a string, or is empty.');
+
       assert.throws(() => {
         new RTCIceCandidate({candidate: 0});
       }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
         'The \'candidate\' property is not a string, or is empty.');
+
       assert.throws(() => {
         new RTCIceCandidate({candidate: '', sdpMid: 0});
       }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
@@ -82,9 +86,11 @@ describe('RTCIceCandidate', () => {
       assert.doesNotThrow(() => {
         new RTCIceCandidate({candidate: newCandidate, sdpMid: 'data'});
       });
+
       assert.doesNotThrow(() => {
         new RTCIceCandidate({candidate: newCandidate, sdpMLineIndex: 0});
       });
+
       assert.doesNotThrow(() => {
         new RTCIceCandidate({candidate: newCandidate, sdpMid: 'data',
           sdpMidLineIndex: 0});
@@ -95,9 +101,11 @@ describe('RTCIceCandidate', () => {
   describe('properties', () => {
     describe('candidate', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.candidate, udpFoundation);
       });
+
       it('should be read-only', () => {
         iceCandidate.candidate = newCandidate;
         assert.strictEqual(iceCandidate.candidate, udpFoundation);
@@ -109,22 +117,28 @@ describe('RTCIceCandidate', () => {
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMid: 'data'
         }).sdpMid, 'data');
+
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMid: 'audio'
         }).sdpMid, 'audio');
+
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMid: 'video'
         }).sdpMid, 'video');
+
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMid: ''
         }).sdpMid, null);
+
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMid: null, sdpMLineIndex: 0
         }).sdpMid, null);
+
         assert.strictEqual(new RTCIceCandidate({
           candidate: newCandidate, sdpMLineIndex: 0
         }).sdpMid, null);
       });
+
       it('should be read-only', () => {
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
         iceCandidate.sdpMid = 'anotherMid';
@@ -134,9 +148,11 @@ describe('RTCIceCandidate', () => {
 
     describe('sdpMLineIndex', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
       });
+
       it('should be read-only', () => {
         iceCandidate.sdpMLineIndex = 9;
         assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
@@ -145,11 +161,13 @@ describe('RTCIceCandidate', () => {
 
     describe('foundation', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
           '1234567891 ' + ipv6 + ' 12345 typ host ' +
           'generation 0 ufrag ABCD network-id 4 network-cost 50');
       });
+
       it('should be read-only', () => {
         iceCandidate.foundation = 'empty foundation';
         assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
@@ -160,9 +178,11 @@ describe('RTCIceCandidate', () => {
 
     describe('priority', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.priority, 1234567891);
       });
+
       it('should be read-only', () => {
         iceCandidate.priority = 9876543219;
         assert.strictEqual(iceCandidate.priority, 1234567891);
@@ -171,9 +191,11 @@ describe('RTCIceCandidate', () => {
 
     describe('ip', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.ip, ipv6);
       });
+
       it('should be read-only', () => {
         iceCandidate.ip = '127.0.0.1';
         assert.strictEqual(iceCandidate.ip, ipv6);
@@ -182,9 +204,11 @@ describe('RTCIceCandidate', () => {
 
     describe('protocol', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.protocol, 'udp');
       });
+
       it('should be read-only', () => {
         iceCandidate.protocol = 'tcp';
         assert.strictEqual(iceCandidate.protocol, 'udp');
@@ -193,9 +217,11 @@ describe('RTCIceCandidate', () => {
 
     describe('port', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.port, 12345);
       });
+
       it('should be read-only', () => {
         iceCandidate.port = 8500;
         assert.strictEqual(iceCandidate.port, 12345);
@@ -204,9 +230,11 @@ describe('RTCIceCandidate', () => {
 
     describe('type', () => {
       const iceCandidate = new RTCIceCandidate(dummyIceCandidate());
+
       it('should have the same value as passed in the constructor', () => {
         assert.strictEqual(iceCandidate.type, 'local');
       });
+
       it('should be read-only', () => {
         iceCandidate.type = 'remote';
         assert.strictEqual(iceCandidate.type, 'local');
@@ -216,11 +244,13 @@ describe('RTCIceCandidate', () => {
     describe('tcpType', () => {
       it('should be null if protocol is set to udp', () => {
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(udpFoundation));
+
         assert.isNull(iceCandidate.tcpType);
       });
 
       it('should be null if tcptype is not set in foundation', () => {
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(tcpFoundation));
+
         assert.isNull(iceCandidate.tcpType);
       });
 
@@ -229,6 +259,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host tcptype active generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.tcpType, 'active');
       });
 
@@ -237,6 +268,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host tcptype passive generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.tcpType, 'passive');
       });
 
@@ -245,6 +277,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host tcptype so generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.tcpType, 'so');
       });
 
@@ -252,6 +285,7 @@ describe('RTCIceCandidate', () => {
         const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
           ipv6 + ' 12345 typ host tcptype invalid generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
+
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
         }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
@@ -262,6 +296,7 @@ describe('RTCIceCandidate', () => {
         const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
           ipv6 + ' 12345 typ host tcptype generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
+
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
         }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
@@ -273,6 +308,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host tcptype active generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         iceCandidate.tcpType = 'passive';
         assert.strictEqual(iceCandidate.tcpType, 'active');
       });
@@ -284,6 +320,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.isNull(iceCandidate.relatedAddress);
       });
 
@@ -292,6 +329,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host raddr 127.0.0.1 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.isNull(iceCandidate.relatedAddress);
       });
 
@@ -300,6 +338,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay raddr 127.0.0.1 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.relatedAddress, '127.0.0.1');
       });
 
@@ -308,6 +347,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay raddr generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.relatedAddress, '');
       });
 
@@ -324,6 +364,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay raddr 127.0.0.1 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         iceCandidate.relatedAddress = '192.168.1.1';
         assert.strictEqual(iceCandidate.relatedAddress, '127.0.0.1');
       });
@@ -335,6 +376,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.isNull(iceCandidate.relatedPort);
       });
 
@@ -343,6 +385,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ host rport 8099 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.isNull(iceCandidate.relatedPort);
       });
 
@@ -351,6 +394,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay rport 8099 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.relatedPort, 8099);
       });
 
@@ -358,6 +402,7 @@ describe('RTCIceCandidate', () => {
         const foundation = 'candidate:123456789 1 tcp 1234567891 ' +
           ipv6 + ' 12345 typ relay rport generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
+
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
         }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
@@ -369,6 +414,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay rport -5 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         assert.strictEqual(iceCandidate.relatedPort, 65531);
       });
 
@@ -377,6 +423,7 @@ describe('RTCIceCandidate', () => {
           ipv6 + ' 12345 typ relay rport 8099 generation 0 ufrag ABCD ' +
           'network-id 4 network-cost 50';
         const iceCandidate = new RTCIceCandidate(dummyIceCandidate(foundation));
+
         iceCandidate.relatedPort = '32555';
         assert.strictEqual(iceCandidate.relatedPort, 8099);
       });
@@ -396,26 +443,5 @@ describe('RTCIceCandidate', () => {
     it('should have 3 properties', () => {
       assert.strictEqual(Object.keys(iceCandidate).length, 3);
     });
-  });
-
-  it('should convert to JSON properly', () => {
-    let iceCandidate = new RTCIceCandidate(dummyIceCandidate());
-    const initializer = JSON.parse(JSON.stringify(iceCandidate));
-
-    iceCandidate = new RTCIceCandidate(initializer);
-    assert.strictEqual(iceCandidate.candidate, udpFoundation);
-    assert.strictEqual(iceCandidate.sdpMid, 'data');
-    assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
-    assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
-      '1234567891 ' + ipv6 + ' 12345 typ host ' +
-      'generation 0 ufrag ABCD network-id 4 network-cost 50');
-    assert.strictEqual(iceCandidate.priority, 1234567891);
-    assert.strictEqual(iceCandidate.ip, ipv6);
-    assert.strictEqual(iceCandidate.protocol, 'udp');
-    assert.strictEqual(iceCandidate.port, 12345);
-    assert.strictEqual(iceCandidate.type, 'local');
-    assert.isNull(iceCandidate.tcpType);
-    assert.isNull(iceCandidate.relatedAddress);
-    assert.isNull(iceCandidate.relatedPort);
   });
 });
