@@ -16,7 +16,7 @@
 
 #include <memory>
 #include <iostream>
-#include <sstream>
+#include "common.h"
 #include "rtcsessiondescription.h"
 
 Nan::Persistent<FunctionTemplate> RTCSessionDescription::constructor;
@@ -25,19 +25,6 @@ static const char sRTCSessionDescription[] = "RTCSessionDescription";
 
 static const char kSdp[] = "sdp";
 static const char kType[] = "type";
-
-static const char ePrefix[] =
-    "Failed to construct 'RTCSessionDescription': ";
-static const char eInvoke[] =
-    "Class constructors cannot be invoked without 'new'";
-static const char eArguments[] =
-    "1 argument required, but only 0 present.";
-static const char eNotObject[] =
-    "parameter 1 ('descriptionInitDict') is not an object.";
-static const char eTypeProperty[] =
-    "The 'type' property is not a string, or is empty.";
-static const char eSdpProperty[] =
-    "The 'sdp' property is not a string, or is empty.";
 
 NAN_MODULE_INIT(RTCSessionDescription::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
@@ -65,62 +52,41 @@ RTCSessionDescription::~RTCSessionDescription() {
 }
 
 NAN_METHOD(RTCSessionDescription::New) {
-  std::stringstream strm;
+  FUNCTION_HEADER("RTCSessionDescription");
 
-  strm << ePrefix;
-  if (!info.IsConstructCall()) {
-    strm << eInvoke;
-    return Nan::ThrowError(strm.str().c_str());
-  }
+  ASSERT_CONSTRUCT_CALL;
+  ASSERT_SINGLE_ARGUMENT;
 
-  if (info.Length() < 1) {
-    strm << eArguments;
-    return Nan::ThrowError(strm.str().c_str());
-  }
+  ASSERT_OBJECT_ARGUMENT(0, descriptionInitDict);
 
-  if (!info[0]->IsObject()) {
-    strm << eNotObject;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  Local<Object> obj = info[0]->ToObject();
-
-  if (!Nan::HasOwnProperty(obj, Nan::New(kType).ToLocalChecked()).FromJust()) {
-    strm << eTypeProperty;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  String::Utf8Value type(
-      obj->Get(Nan::New(kType).ToLocalChecked())->ToString());
+  ASSERT_OBJECT_PROPERTY(descriptionInitDict, kType, typeVal);
+  ASSERT_PROPERTY_STRING(kType, typeVal, type);
 
   if (std::string("answer").compare(*type) &&
       std::string("offer").compare(*type) &&
       std::string("pranswer").compare(*type) &&
       std::string("rollback").compare(*type)) {
-    strm << "The provided value '";
-    strm << std::string(*type);
-    strm << "' is not a valid enum value of type RTCSdpType.";
-    return Nan::ThrowTypeError(strm.str().c_str());
+    errorStream << "The provided value '";
+    errorStream << std::string(*type);
+    errorStream << "' is not a valid enum value of type RTCSdpType.";
+    return Nan::ThrowTypeError(errorStream.str().c_str());
   }
 
-  if (!Nan::HasOwnProperty(obj, Nan::New(kSdp).ToLocalChecked()).FromJust()) {
-    strm << eSdpProperty;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  String::Utf8Value sdp(obj->Get(Nan::New(kSdp).ToLocalChecked())->ToString());
+  ASSERT_OBJECT_PROPERTY(descriptionInitDict, kSdp, sdpVal);
+  ASSERT_PROPERTY_STRING(kSdp, sdpVal, sdp);
 
   webrtc::SdpParseError error;
-  webrtc::SessionDescriptionInterface *desc(
-      webrtc::CreateSessionDescription(*type, *sdp, &error));
+  webrtc::SessionDescriptionInterface *desc;
+  desc = webrtc::CreateSessionDescription(*type, *sdp, &error);
 
   if (!desc) {
-    return Nan::ThrowError(
-        Nan::New(ePrefix + error.description).ToLocalChecked());
+    errorStream << error.description;
+    return Nan::ThrowTypeError(errorStream.str().c_str());
   }
 
   RTCSessionDescription *rtcIceCandidate = new RTCSessionDescription(desc);
   rtcIceCandidate->Wrap(info.This());
+
   info.GetReturnValue().Set(info.This());
 }
 
