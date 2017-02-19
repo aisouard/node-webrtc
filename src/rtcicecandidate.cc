@@ -134,6 +134,12 @@ NAN_METHOD(RTCIceCandidate::New) {
   Local<Value> sdpMLineIndexVal = obj->Get(
       Nan::New(kSdpMLineIndex).ToLocalChecked());
 
+  if ((sdpMidVal->IsNull() || sdpMidVal->IsUndefined()) &&
+      (sdpMLineIndexVal->IsNull() || sdpMLineIndexVal->IsUndefined())) {
+    strm << eBothAreNull;
+    return Nan::ThrowTypeError(strm.str().c_str());
+  }
+
   String::Utf8Value candidate(candidateVal->ToString());
   String::Utf8Value sdpMid(sdpMidVal->ToString());
   int32_t sdpMLineIndex = sdpMLineIndexVal->Int32Value();
