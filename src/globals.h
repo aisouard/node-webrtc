@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-#include <nan.h>
-#include "globals.h"
-#include "rtcicecandidate.h"
-#include "rtcsessiondescription.h"
+#ifndef GLOBALS_H_
+#define GLOBALS_H_
 
-NAN_MODULE_INIT(Init) {
-  Globals::Init();
+#include <webrtc/api/peerconnectioninterface.h>
+#include <webrtc/base/thread.h>
 
-  RTCIceCandidate::Init(target);
-  RTCSessionDescription::Init(target);
+class Globals {
+ public:
+  static bool Init();
+  static bool Update();
+  static void Cleanup(void* args);
 
-  node::AtExit(Globals::Cleanup);
-}
+  static rtc::Thread *GetSignalingThread();
+  static rtc::Thread *GetWorkerThread();
+  static webrtc::PeerConnectionFactoryInterface *GetPeerConnectionFactory();
 
-NODE_MODULE(webrtc, Init)
+ private:
+  static rtc::Thread *_signalingThread;
+  static rtc::Thread *_workerThread;
+  static webrtc::PeerConnectionFactoryInterface *_peerConnectionFactory;
+};
+
+#endif  // GLOBALS_H_
