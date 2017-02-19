@@ -99,4 +99,16 @@
   \
   String::Utf8Value S(V->ToString());
 
+#define DECLARE_OBJECT_PROPERTY(O, P, V) \
+  Local<Value> V = O->Get(LOCAL_STRING(P));
+
+#define LOCAL_STRING(S) \
+  Nan::New(S).ToLocalChecked()
+
+#define HAS_OWN_PROPERTY(O, P) \
+  Nan::HasOwnProperty(O, LOCAL_STRING(P)).FromJust()
+
+#define IS_STRICTLY_NULL(V) \
+  (V->IsNull() || V->IsUndefined())
+
 #endif  // COMMON_H_

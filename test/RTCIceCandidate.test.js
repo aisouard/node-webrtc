@@ -47,6 +47,8 @@ function dummyIceCandidate(foundation) {
 }
 
 describe('RTCIceCandidate', () => {
+  const errorPrefix = 'Failed to construct \'RTCIceCandidate\': ';
+
   describe('constructor', () => {
     it('should be invoked exclusively with the \'new\' operator', () => {
       assert.throws(() => {
@@ -57,43 +59,40 @@ describe('RTCIceCandidate', () => {
     it('should throw a TypeError when invoked with empty parameters', () => {
       assert.throws(() => {
         new RTCIceCandidate();
-      }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-        '1 argument required, but only 0 present.');
+      }, Error, errorPrefix + '1 argument required, but only 0 present.');
     });
 
     it('should throw when invoked with invalid parameters', () => {
       assert.throws(() => {
         new RTCIceCandidate(26);
-      }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
-        'parameter 1 (\'candidateInitDict\') is not an object.');
+      }, TypeError, errorPrefix + 'parameter 1 (\'candidateInitDict\') ' +
+        'is not an object.');
 
       assert.throws(() => {
         new RTCIceCandidate('another string');
-      }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
-        'parameter 1 (\'candidateInitDict\') is not an object.');
+      }, TypeError, errorPrefix + 'parameter 1 (\'candidateInitDict\') ' +
+        'is not an object.');
 
       assert.throws(() => {
         new RTCIceCandidate({});
-      }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
-        'The \'candidate\' property is not a string, or is empty.');
+      }, TypeError, errorPrefix + 'The \'candidate\' property is undefined.');
 
       assert.throws(() => {
         new RTCIceCandidate({candidate: 0});
-      }, TypeError, 'Failed to construct \'RTCIceCandidate\': ' +
-        'The \'candidate\' property is not a string, or is empty.');
+      }, TypeError, errorPrefix + 'The \'candidate\' property is ' +
+        'not a string, or is empty.');
 
       assert.throws(() => {
         new RTCIceCandidate({candidate: '', sdpMid: 0});
-      }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-        'Expect line: candidate:<candidate-str>');
+      }, Error, errorPrefix + 'Expect line: candidate:<candidate-str>');
     });
 
     it('should throw a TypeError if both sdpMid and sdpMLineIndex are null',
       () => {
         assert.throws(() => {
           new RTCIceCandidate({candidate: ''});
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Both \'sdpMid\' and \'sdpMLineIndex\' properties are null.');
+        }, Error, errorPrefix + 'Both \'sdpMid\' and \'sdpMLineIndex\' ' +
+          'properties are null.');
       }
     );
 
@@ -225,8 +224,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Expects at least 8 fields.');
+        }, Error, errorPrefix + 'Expects at least 8 fields.');
       });
 
       it('should be equal to tcp if tcp is set in foundation', () => {
@@ -254,8 +252,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Unsupported transport type.');
+        }, Error, errorPrefix + 'Unsupported transport type.');
       });
 
       it('should be read-only', () => {
@@ -274,8 +271,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Expects at least 8 fields.');
+        }, Error, errorPrefix + 'Expects at least 8 fields.');
       });
 
       it('should throw an error if port is invalid', () => {
@@ -285,8 +281,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Invalid value: --.');
+        }, Error, errorPrefix + 'Invalid value: --.');
       });
 
       it('should be 0 if port is set to 0 in foundation', () => {
@@ -337,8 +332,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Unsupported candidate type.');
+        }, Error, errorPrefix + 'Unsupported candidate type.');
       });
 
       it('should throw an error if typ is invalid', () => {
@@ -348,8 +342,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Unsupported candidate type.');
+        }, Error, errorPrefix + 'Unsupported candidate type.');
       });
 
       it('should be local if typ is set to host in foundation', () => {
@@ -441,8 +434,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Invalid TCP candidate type.');
+        }, Error, errorPrefix + 'Invalid TCP candidate type.');
       });
 
       it('should throw an error on empty tcptype set in foundation', () => {
@@ -452,8 +444,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Invalid TCP candidate type.');
+        }, Error, errorPrefix + 'Invalid TCP candidate type.');
       });
 
       it('should be read-only', () => {
@@ -558,8 +549,7 @@ describe('RTCIceCandidate', () => {
 
         assert.throws(() => {
           new RTCIceCandidate(dummyIceCandidate(foundation));
-        }, Error, 'Failed to construct \'RTCIceCandidate\': ' +
-          'Invalid value: generation.');
+        }, Error, errorPrefix + 'Invalid value: generation.');
       });
 
       it('should be 65531 if rport is set to -5 in foundation', () => {

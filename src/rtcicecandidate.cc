@@ -19,6 +19,7 @@
 #include <webrtc/p2p/base/candidate.h>
 #include <webrtc/p2p/base/port.h>
 
+#include "common.h"
 #include "rtcicecandidate.h"
 
 Nan::Persistent<FunctionTemplate> RTCIceCandidate::constructor;
@@ -38,54 +39,35 @@ static const char kTcpType[] = "tcpType";
 static const char kRelatedAddress[] = "relatedAddress";
 static const char kRelatedPort[] = "relatedPort";
 
-static const char ePrefix[] =
-    "Failed to construct 'RTCIceCandidate': ";
-static const char eInvoke[] =
-    "Class constructors cannot be invoked without 'new'";
-static const char eArguments[] =
-    "1 argument required, but only 0 present.";
-static const char eNotObject[] =
-    "parameter 1 ('candidateInitDict') is not an object.";
-static const char eCandidateProperty[] =
-    "The 'candidate' property is not a string, or is empty.";
 static const char eBothAreNull[] =
     "Both 'sdpMid' and 'sdpMLineIndex' properties are null.";
 static const char eSerialize[] =
     "Failed to serialize ICE candidate.";
-static const char eExpectedValue[] =
-    "Expected value type ";
 
 NAN_MODULE_INIT(RTCIceCandidate::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
 
-  ctor->SetClassName(Nan::New(sRTCIceCandidate).ToLocalChecked());
+  ctor->SetClassName(LOCAL_STRING(sRTCIceCandidate));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
   Local<ObjectTemplate> instance = ctor->InstanceTemplate();
-  Nan::SetAccessor(instance, Nan::New(kCandidate).ToLocalChecked(),
-                   GetCandidate);
-  Nan::SetAccessor(instance, Nan::New(kSdpMid).ToLocalChecked(), GetSdpMid);
-  Nan::SetAccessor(instance, Nan::New(kSdpMLineIndex).ToLocalChecked(),
-                   GetSdpMLineIndex);
+  Nan::SetAccessor(instance, LOCAL_STRING(kCandidate), GetCandidate);
+  Nan::SetAccessor(instance, LOCAL_STRING(kSdpMid), GetSdpMid);
+  Nan::SetAccessor(instance, LOCAL_STRING(kSdpMLineIndex), GetSdpMLineIndex);
 
   Local<ObjectTemplate> prototype = ctor->PrototypeTemplate();
-  Nan::SetAccessor(prototype, Nan::New(kFoundation).ToLocalChecked(),
-                   GetCandidate);
-  Nan::SetAccessor(prototype, Nan::New(kPriority).ToLocalChecked(),
-                   GetPriority);
-  Nan::SetAccessor(prototype, Nan::New(kIp).ToLocalChecked(), GetIp);
-  Nan::SetAccessor(prototype, Nan::New(kProtocol).ToLocalChecked(),
-                   GetProtocol);
-  Nan::SetAccessor(prototype, Nan::New(kPort).ToLocalChecked(), GetPort);
-  Nan::SetAccessor(prototype, Nan::New(kType).ToLocalChecked(), GetType);
-  Nan::SetAccessor(prototype, Nan::New(kTcpType).ToLocalChecked(), GetTcpType);
-  Nan::SetAccessor(prototype, Nan::New(kRelatedAddress).ToLocalChecked(),
-                   GetRelatedAddress);
-  Nan::SetAccessor(prototype, Nan::New(kRelatedPort).ToLocalChecked(),
-                   GetRelatedPort);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kFoundation), GetCandidate);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kPriority), GetPriority);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kIp), GetIp);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kProtocol), GetProtocol);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kPort), GetPort);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kType), GetType);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kTcpType), GetTcpType);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kRelatedAddress), GetRelatedAddress);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kRelatedPort), GetRelatedPort);
 
   constructor.Reset(ctor);
-  Nan::Set(target, Nan::New(sRTCIceCandidate).ToLocalChecked(),
+  Nan::Set(target, LOCAL_STRING(sRTCIceCandidate),
            ctor->GetFunction());
 }
 
@@ -98,63 +80,40 @@ RTCIceCandidate::~RTCIceCandidate() {
 }
 
 NAN_METHOD(RTCIceCandidate::New) {
-  std::stringstream strm;
+  CONSTRUCTOR_HEADER(RTCIceCandidate)
 
-  strm << ePrefix;
-  if (!info.IsConstructCall()) {
-    strm << eInvoke;
-    return Nan::ThrowError(strm.str().c_str());
+  ASSERT_CONSTRUCT_CALL;
+
+  ASSERT_SINGLE_ARGUMENT;
+  ASSERT_OBJECT_ARGUMENT(0, candidateInitDict);
+  ASSERT_OBJECT_PROPERTY(candidateInitDict, kCandidate, candidateVal);
+  ASSERT_PROPERTY_STRING(kCandidate, candidateVal, cand);
+
+  if (!HAS_OWN_PROPERTY(candidateInitDict, kSdpMid) &&
+      !HAS_OWN_PROPERTY(candidateInitDict, kSdpMLineIndex)) {
+    errorStream << eBothAreNull;
+    return Nan::ThrowError(errorStream.str().c_str());
   }
 
-  if (info.Length() < 1) {
-    strm << eArguments;
-    return Nan::ThrowError(strm.str().c_str());
+  DECLARE_OBJECT_PROPERTY(candidateInitDict, kSdpMid, sdpMidVal);
+  DECLARE_OBJECT_PROPERTY(candidateInitDict, kSdpMLineIndex, sdpMLineIndexVal);
+
+  if (IS_STRICTLY_NULL(sdpMidVal) && IS_STRICTLY_NULL(sdpMLineIndexVal)) {
+    errorStream << eBothAreNull;
+    return Nan::ThrowError(errorStream.str().c_str());
   }
 
-  if (!info[0]->IsObject()) {
-    strm << eNotObject;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  Local<Object> obj = info[0]->ToObject();
-
-  if (!Nan::HasOwnProperty(obj,
-                           Nan::New(kCandidate).ToLocalChecked()).FromJust()) {
-    strm << eCandidateProperty;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  Local<Value> candidateVal =
-      obj->Get(Nan::New(kCandidate).ToLocalChecked());
-
-  if (!candidateVal->IsString()) {
-    strm << eCandidateProperty;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  Local<Value> sdpMidVal = obj->Get(Nan::New(kSdpMid).ToLocalChecked());
-  Local<Value> sdpMLineIndexVal = obj->Get(
-      Nan::New(kSdpMLineIndex).ToLocalChecked());
-
-  if ((sdpMidVal->IsNull() || sdpMidVal->IsUndefined()) &&
-      (sdpMLineIndexVal->IsNull() || sdpMLineIndexVal->IsUndefined())) {
-    strm << eBothAreNull;
-    return Nan::ThrowTypeError(strm.str().c_str());
-  }
-
-  String::Utf8Value candidate(candidateVal->ToString());
   String::Utf8Value sdpMid(sdpMidVal->ToString());
   int32_t sdpMLineIndex = sdpMLineIndexVal->Int32Value();
 
   webrtc::SdpParseError error;
-  webrtc::IceCandidateInterface *iceCandidate(
-      webrtc::CreateIceCandidate(
-          sdpMidVal->IsNull() || sdpMidVal->IsUndefined() ? "" : *sdpMid,
-          sdpMLineIndex, *candidate, &error));
+  webrtc::IceCandidateInterface *iceCandidate;
+  iceCandidate = webrtc::CreateIceCandidate(
+      IS_STRICTLY_NULL(sdpMidVal) ? "" : *sdpMid, sdpMLineIndex, *cand, &error);
 
   if (!iceCandidate) {
-    strm << error.description;
-    return Nan::ThrowError(strm.str().c_str());
+    errorStream << error.description;
+    return Nan::ThrowError(errorStream.str().c_str());
   }
 
   RTCIceCandidate *rtcIceCandidate = new RTCIceCandidate(iceCandidate);
@@ -168,10 +127,10 @@ NAN_GETTER(RTCIceCandidate::GetCandidate) {
       info.This());
 
   if (!object->_iceCandidate->ToString(&candidate)) {
-    return Nan::ThrowError(Nan::New(eSerialize).ToLocalChecked());
+    return Nan::ThrowError(eSerialize);
   }
 
-  info.GetReturnValue().Set(Nan::New(candidate).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(candidate));
 }
 
 NAN_GETTER(RTCIceCandidate::GetSdpMid) {
@@ -183,8 +142,7 @@ NAN_GETTER(RTCIceCandidate::GetSdpMid) {
     return;
   }
 
-  info.GetReturnValue().Set(
-      Nan::New(object->_iceCandidate->sdp_mid()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(object->_iceCandidate->sdp_mid()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetSdpMLineIndex) {
@@ -199,7 +157,7 @@ NAN_GETTER(RTCIceCandidate::GetFoundation) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  info.GetReturnValue().Set(Nan::New(cand.foundation()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(cand.foundation()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetPriority) {
@@ -215,8 +173,7 @@ NAN_GETTER(RTCIceCandidate::GetIp) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  info.GetReturnValue().Set(
-      Nan::New(cand.address().ipaddr().ToString()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(cand.address().ipaddr().ToString()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetProtocol) {
@@ -224,7 +181,7 @@ NAN_GETTER(RTCIceCandidate::GetProtocol) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  info.GetReturnValue().Set(Nan::New(cand.protocol()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(cand.protocol()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetPort) {
@@ -240,7 +197,7 @@ NAN_GETTER(RTCIceCandidate::GetType) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  info.GetReturnValue().Set(Nan::New(cand.type()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(cand.type()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetTcpType) {
@@ -254,7 +211,7 @@ NAN_GETTER(RTCIceCandidate::GetTcpType) {
     return;
   }
 
-  info.GetReturnValue().Set(Nan::New(tcptype).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(tcptype));
 }
 
 NAN_GETTER(RTCIceCandidate::GetRelatedAddress) {
@@ -269,7 +226,7 @@ NAN_GETTER(RTCIceCandidate::GetRelatedAddress) {
   }
 
   info.GetReturnValue().Set(
-      Nan::New(cand.related_address().ipaddr().ToString()).ToLocalChecked());
+      LOCAL_STRING(cand.related_address().ipaddr().ToString()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetRelatedPort) {
