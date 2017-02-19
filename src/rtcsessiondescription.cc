@@ -26,20 +26,24 @@ static const char sRTCSessionDescription[] = "RTCSessionDescription";
 static const char kSdp[] = "sdp";
 static const char kType[] = "type";
 
+static const char kAnswer[] = "answer";
+static const char kOffer[] = "offer";
+static const char kPranswer[] = "pranswer";
+static const char kRollback[] = "rollback";
+
 NAN_MODULE_INIT(RTCSessionDescription::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
 
-  ctor->SetClassName(Nan::New(sRTCSessionDescription).ToLocalChecked());
+  ctor->SetClassName(LOCAL_STRING(sRTCSessionDescription));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
   Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
 
-  Nan::SetAccessor(tpl, Nan::New(kSdp).ToLocalChecked(), GetSdp);
-  Nan::SetAccessor(tpl, Nan::New(kType).ToLocalChecked(), GetType);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kSdp), GetSdp);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kType), GetType);
 
   constructor.Reset(ctor);
-  Nan::Set(target, Nan::New(sRTCSessionDescription).ToLocalChecked(),
-           ctor->GetFunction());
+  Nan::Set(target, LOCAL_STRING(sRTCSessionDescription), ctor->GetFunction());
 }
 
 RTCSessionDescription::RTCSessionDescription(
@@ -62,10 +66,10 @@ NAN_METHOD(RTCSessionDescription::New) {
   ASSERT_OBJECT_PROPERTY(descriptionInitDict, kType, typeVal);
   ASSERT_PROPERTY_STRING(kType, typeVal, type);
 
-  if (std::string("answer").compare(*type) &&
-      std::string("offer").compare(*type) &&
-      std::string("pranswer").compare(*type) &&
-      std::string("rollback").compare(*type)) {
+  if (std::string(kAnswer).compare(*type) &&
+      std::string(kOffer).compare(*type) &&
+      std::string(kPranswer).compare(*type) &&
+      std::string(kRollback).compare(*type)) {
     errorStream << "The provided value '";
     errorStream << std::string(*type);
     errorStream << "' is not a valid enum value of type RTCSdpType.";
@@ -94,8 +98,7 @@ NAN_GETTER(RTCSessionDescription::GetType) {
   RTCSessionDescription *object =
       Nan::ObjectWrap::Unwrap<RTCSessionDescription>(info.This());
 
-  info.GetReturnValue().Set(
-      Nan::New(object->_sessionDescription->type()).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(object->_sessionDescription->type()));
 }
 
 NAN_GETTER(RTCSessionDescription::GetSdp) {
@@ -104,5 +107,5 @@ NAN_GETTER(RTCSessionDescription::GetSdp) {
       Nan::ObjectWrap::Unwrap<RTCSessionDescription>(info.This());
 
   object->_sessionDescription->ToString(&sdp);
-  info.GetReturnValue().Set(Nan::New(sdp).ToLocalChecked());
+  info.GetReturnValue().Set(LOCAL_STRING(sdp));
 }
