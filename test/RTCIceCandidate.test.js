@@ -18,8 +18,7 @@ const tcpFoundation = 'candidate:123456789 1 tcp 1234567891 ' +
   'network-id 4 network-cost 50';
 
 const newCandidate = 'candidate:987654321 1 udp 987654321 ' +
-  '7777:6666:555:4444:3333:2222:1111:0 54321 typ host ' +
-  'generation 0 ufrag DCBA network-id 4 network-cost 50';
+  ipv6 + ' 54321 typ host generation 0 ufrag DCBA network-id 4 network-cost 50';
 
 function dummyIceCandidate(foundation) {
   foundation = foundation || udpFoundation;
