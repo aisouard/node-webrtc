@@ -4,8 +4,13 @@ const chai = require('chai');
 const assert = chai.assert;
 const RTCIceCandidate = require('../').RTCIceCandidate;
 
+let ipv6 = '0:1111:222:3333:4444:5555:6666:7777';
+if (process.platform == 'darwin') {
+  ipv6 = '::1111:222:3333:4444:5555:6666:7777';
+}
+
 const candidate = 'candidate:123456789 1 udp 1234567891 ' +
-  '0:1111:222:3333:4444:5555:6666:7777 12345 typ host ' +
+  ipv6 + ' 12345 typ host ' +
   'generation 0 ufrag ABCD network-id 4 network-cost 50';
 
 const newCandidate = 'candidate:987654321 1 udp 987654321 ' +
@@ -78,10 +83,10 @@ describe('RTCIceCandidate', () => {
     assert.strictEqual(iceCandidate.sdpMid, 'data');
     assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
     assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
-      '1234567891 0:1111:222:3333:4444:5555:6666:7777 12345 typ host ' +
+      '1234567891 ' + ipv6 + ' 12345 typ host ' +
       'generation 0 ufrag ABCD network-id 4 network-cost 50');
     assert.strictEqual(iceCandidate.priority, 1234567891);
-    assert.strictEqual(iceCandidate.ip, '0:1111:222:3333:4444:5555:6666:7777');
+    assert.strictEqual(iceCandidate.ip, ipv6);
     assert.strictEqual(iceCandidate.protocol, 'udp');
     assert.strictEqual(iceCandidate.port, 12345);
     assert.strictEqual(iceCandidate.type, 'local');
@@ -99,10 +104,10 @@ describe('RTCIceCandidate', () => {
     assert.strictEqual(iceCandidate.sdpMid, 'data');
     assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
     assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
-      '1234567891 0:1111:222:3333:4444:5555:6666:7777 12345 typ host ' +
+      '1234567891 ' + ipv6 + ' 12345 typ host ' +
       'generation 0 ufrag ABCD network-id 4 network-cost 50');
     assert.strictEqual(iceCandidate.priority, 1234567891);
-    assert.strictEqual(iceCandidate.ip, '0:1111:222:3333:4444:5555:6666:7777');
+    assert.strictEqual(iceCandidate.ip, ipv6);
     assert.strictEqual(iceCandidate.protocol, 'udp');
     assert.strictEqual(iceCandidate.port, 12345);
     assert.strictEqual(iceCandidate.type, 'local');
@@ -131,10 +136,10 @@ describe('RTCIceCandidate', () => {
     assert.strictEqual(iceCandidate.sdpMid, 'data');
     assert.strictEqual(iceCandidate.sdpMLineIndex, 0);
     assert.strictEqual(iceCandidate.foundation, 'candidate:123456789 1 udp ' +
-      '1234567891 0:1111:222:3333:4444:5555:6666:7777 12345 typ host ' +
+      '1234567891 ' + ipv6 + ' 12345 typ host ' +
       'generation 0 ufrag ABCD network-id 4 network-cost 50');
     assert.strictEqual(iceCandidate.priority, 1234567891);
-    assert.strictEqual(iceCandidate.ip, '0:1111:222:3333:4444:5555:6666:7777');
+    assert.strictEqual(iceCandidate.ip, ipv6);
     assert.strictEqual(iceCandidate.protocol, 'udp');
     assert.strictEqual(iceCandidate.port, 12345);
     assert.strictEqual(iceCandidate.type, 'local');
