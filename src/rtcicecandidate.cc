@@ -174,6 +174,11 @@ NAN_GETTER(RTCIceCandidate::GetSdpMid) {
   RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
       info.This());
 
+  if (!object->_iceCandidate->sdp_mid().length()) {
+    info.GetReturnValue().SetNull();
+    return;
+  }
+
   info.GetReturnValue().Set(
       Nan::New(object->_iceCandidate->sdp_mid()).ToLocalChecked());
 }
