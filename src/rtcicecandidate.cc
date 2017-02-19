@@ -118,7 +118,8 @@ NAN_METHOD(RTCIceCandidate::New) {
 
   Local<Object> obj = info[0]->ToObject();
 
-  if (!Nan::HasOwnProperty(obj, Nan::New(kCandidate).ToLocalChecked()).FromJust()) {
+  if (!Nan::HasOwnProperty(obj,
+                           Nan::New(kCandidate).ToLocalChecked()).FromJust()) {
     strm << eCandidateProperty;
     return Nan::ThrowTypeError(strm.str().c_str());
   }
@@ -147,7 +148,9 @@ NAN_METHOD(RTCIceCandidate::New) {
 
   webrtc::SdpParseError error;
   webrtc::IceCandidateInterface *iceCandidate(
-      webrtc::CreateIceCandidate(sdpMidVal->IsNull() || sdpMidVal->IsUndefined() ? "" : *sdpMid, sdpMLineIndex, *candidate, &error));
+      webrtc::CreateIceCandidate(
+          sdpMidVal->IsNull() || sdpMidVal->IsUndefined() ? "" : *sdpMid,
+          sdpMLineIndex, *candidate, &error));
 
   if (!iceCandidate) {
     strm << error.description;
