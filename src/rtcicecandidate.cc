@@ -146,7 +146,7 @@ NAN_METHOD(RTCIceCandidate::New) {
 
   webrtc::SdpParseError error;
   webrtc::IceCandidateInterface *iceCandidate(
-      webrtc::CreateIceCandidate(*sdpMid, sdpMLineIndex, *candidate, &error));
+      webrtc::CreateIceCandidate(sdpMidVal->IsNull() || sdpMidVal->IsUndefined() ? "" : *sdpMid, sdpMLineIndex, *candidate, &error));
 
   if (!iceCandidate) {
     strm << error.description;
