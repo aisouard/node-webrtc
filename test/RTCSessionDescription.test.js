@@ -30,6 +30,8 @@ const sdp = {
 };
 
 describe('RTCSessionDescription', () => {
+  const errorPrefix = 'Failed to construct \'RTCSessionDescription\': ';
+
   it('should be invoked exclusively with the \'new\' operator', () => {
     assert.throws(() => {
       RTCSessionDescription();
@@ -39,23 +41,21 @@ describe('RTCSessionDescription', () => {
   it('should throw an Error when invoked with empty parameters', () => {
     assert.throws(() => {
       new RTCSessionDescription();
-    }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-      '1 argument required, but only 0 present.');
+    }, Error, errorPrefix + '1 argument required, but only 0 present.');
   });
 
   it('should throw a TypeError when invoked with an invalid parameter', () => {
     assert.throws(() => {
       new RTCSessionDescription(12);
-    }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-      'parameter 1 (\'descriptionInitDict\') is not an object.');
+    }, TypeError, errorPrefix + 'parameter 1 (\'descriptionInitDict\') ' +
+      'is not an object.');
   });
 
   it('should throw a TypeError when invoked without the \'type\' property',
     () => {
       assert.throws(() => {
         new RTCSessionDescription({});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'type\' property is undefined.');
+      }, TypeError, errorPrefix + 'The \'type\' property is undefined.');
     }
   );
 
@@ -63,19 +63,18 @@ describe('RTCSessionDescription', () => {
     () => {
       assert.throws(() => {
         new RTCSessionDescription({type: 'anything'});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The provided value \'anything\' is not a valid enum value of type ' +
-        'RTCSdpType.');
+      }, TypeError, errorPrefix + 'The provided value \'anything\' is not ' +
+        'a valid enum value of type RTCSdpType.');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 1.56});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'type\' property is not a string, or is empty.');
+      }, TypeError, errorPrefix + 'The \'type\' property is not a string, ' +
+        'or is empty.');
 
       assert.throws(() => {
         new RTCSessionDescription({type: {}});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'type\' property is not a string, or is empty.');
+      }, TypeError, errorPrefix + 'The \'type\' property is not a string, ' +
+        'or is empty.');
     }
   );
 
@@ -83,24 +82,20 @@ describe('RTCSessionDescription', () => {
     () => {
       assert.throws(() => {
         new RTCSessionDescription({type: 'offer'});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'sdp\' property is undefined.');
+      }, TypeError, errorPrefix + 'The \'sdp\' property is undefined.');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'answer'});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'sdp\' property is undefined.');
+      }, TypeError, errorPrefix + 'The \'sdp\' property is undefined.');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'pranswer'});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'sdp\' property is undefined.');
+      }, TypeError, errorPrefix + 'The \'sdp\' property is undefined.');
 
       // TODO: "if type is rollback, this member is unused."
       assert.throws(() => {
         new RTCSessionDescription({type: 'rollback'});
-      }, TypeError, 'Failed to construct \'RTCSessionDescription\': ' +
-        'The \'sdp\' property is undefined.');
+      }, TypeError, errorPrefix + 'The \'sdp\' property is undefined.');
     }
   );
 
@@ -108,33 +103,27 @@ describe('RTCSessionDescription', () => {
     () => {
       assert.throws(() => {
         new RTCSessionDescription({type: 'offer', sdp: 'anything'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: v=');
+      }, Error, errorPrefix + 'Expect line: v=');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'offer', sdp: 'v=0\r\n'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: o=');
+      }, Error, errorPrefix + 'Expect line: o=');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'answer', sdp: 'anything'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: v=');
+      }, Error, errorPrefix + 'Expect line: v=');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'answer', sdp: 'v=0\r\n'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: o=');
+      }, Error, errorPrefix + 'Expect line: o=');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'pranswer', sdp: 'anything'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: v=');
+      }, Error, errorPrefix + 'Expect line: v=');
 
       assert.throws(() => {
         new RTCSessionDescription({type: 'pranswer', sdp: 'v=0\r\n'});
-      }, Error, 'Failed to construct \'RTCSessionDescription\': ' +
-        'Expect line: o=');
+      }, Error, errorPrefix + 'Expect line: o=');
     }
   );
 
