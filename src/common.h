@@ -24,7 +24,7 @@
   "Class constructors cannot be invoked without 'new'"
 
 #define ERROR_CONSTRUCT_PREFIX(NAME) \
-  "Failed to construct '" NAME "': "
+  "Failed to construct '" #NAME "': "
 
 #define ERROR_NOT_SINGLE_ARGUMENT(COUNT) \
   "1 argument required, but only " << COUNT << " present."
@@ -42,14 +42,19 @@
   "parameter " << INDEX << " ('" << NAME << "') is not an object."
 
 #ifdef DEBUG
-#define FUNCTION_HEADER(NAME) \
+#define CONSTRUCTOR_HEADER(NAME) \
   LOG(LS_INFO) << __PRETTY_FUNCTION__; \
   std::stringstream errorStream; \
   errorStream << ERROR_CONSTRUCT_PREFIX(NAME);
+#define METHOD_HEADER(NAME) \
+  LOG(LS_INFO) << __PRETTY_FUNCTION__; \
+  std::stringstream errorStream;
 #else
-#define FUNCTION_HEADER(NAME) \
+#define CONSTRUCTOR_HEADER(NAME) \
   std::stringstream errorStream; \
   errorStream << ERROR_CONSTRUCT_PREFIX(NAME);
+#define METHOD_HEADER(NAME) \
+  std::stringstream errorStream;
 #endif
 
 #define ASSERT_CONSTRUCT_CALL \

@@ -52,7 +52,7 @@ RTCSessionDescription::~RTCSessionDescription() {
 }
 
 NAN_METHOD(RTCSessionDescription::New) {
-  FUNCTION_HEADER("RTCSessionDescription");
+  CONSTRUCTOR_HEADER(RTCSessionDescription);
 
   ASSERT_CONSTRUCT_CALL;
   ASSERT_SINGLE_ARGUMENT;
