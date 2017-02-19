@@ -4,6 +4,7 @@
             'target_name': 'webrtc',
             'sources': [
                 'src/module.cc',
+                'src/rtcicecandidate.cc',
                 'src/rtcsessiondescription.cc',
             ],
             'include_dirs' : [

@@ -15,9 +15,11 @@
  */
 
 #include <nan.h>
+#include "rtcicecandidate.h"
 #include "rtcsessiondescription.h"
 
 NAN_MODULE_INIT(Init) {
+  RTCIceCandidate::Init(target);
   RTCSessionDescription::Init(target);
 }
 
