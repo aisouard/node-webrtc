@@ -48,7 +48,7 @@ Apache License 2.0 © [Axel Isouard][author]
 [license-href]:https://opensource.org/licenses/Apache-2.0
 [appveyor-img]:https://ci.appveyor.com/api/projects/status/i6c5x98af1rdgtub?svg=true
 [appveyor-href]:https://ci.appveyor.com/project/aisouard/node-webrtc
-[travis-img]:https://travis-ci.org/aisouard/node-webrtc.svg?branch=master
+[travis-img]:https://travis-ci.org/aisouard/node-webrtc.svg?branch=develop
 [travis-href]:https://travis-ci.org/aisouard/node-webrtc
 [gitter-img]:https://badges.gitter.im/aisouard/node-webrtc.svg
 [gitter-href]:https://gitter.im/aisouard/node-webrtc?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
