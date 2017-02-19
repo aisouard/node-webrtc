@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+#include <nan.h>
+
+#if WEBRTC_WIN
+#include <webrtc/base/win32socketinit.h>
+#include <webrtc/base/win32socketserver.h>
+#endif
+
 #include <webrtc/base/ssladapter.h>
 #include "globals.h"
 
@@ -22,6 +29,10 @@ rtc::Thread *Globals::_workerThread = NULL;
 webrtc::PeerConnectionFactoryInterface *Globals::_peerConnectionFactory = NULL;
 
 bool Globals::Init() {
+#if WEBRTC_WIN
+  rtc::EnsureWinsockInit();
+#endif
+
   rtc::InitializeSSL();
   rtc::InitRandom(rtc::Time());
   rtc::ThreadManager::Instance()->WrapCurrentThread();
@@ -34,6 +45,12 @@ bool Globals::Init() {
 
   if (!_signalingThread->Start() || !_workerThread->Start()) {
     return false;
+  }
+
+  rtc::ThreadManager::Instance()->SetCurrentThread(_signalingThread);
+
+  if (rtc::ThreadManager::Instance()->CurrentThread() != _signalingThread) {
+    Nan::ThrowError("Failed to set the current thread.");
   }
 
   _peerConnectionFactory =
@@ -52,8 +69,15 @@ void Globals::Cleanup(void* args) {
   _peerConnectionFactory->Release();
   _peerConnectionFactory = NULL;
 
+  _signalingThread->SetAllowBlockingCalls(true);
   _signalingThread->Stop();
+
+  _workerThread->SetAllowBlockingCalls(true);
   _workerThread->Stop();
+
+  if (rtc::ThreadManager::Instance()->CurrentThread() == _signalingThread) {
+    rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
+  }
 
   delete _signalingThread;
   delete _workerThread;
