@@ -123,9 +123,8 @@ NAN_METHOD(RTCIceCandidate::New) {
 }
 
 NAN_GETTER(RTCIceCandidate::GetCandidate) {
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   std::string candidate;
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
 
   if (!object->_iceCandidate->ToString(&candidate)) {
     return Nan::ThrowError(eSerialize);
@@ -135,8 +134,7 @@ NAN_GETTER(RTCIceCandidate::GetCandidate) {
 }
 
 NAN_GETTER(RTCIceCandidate::GetSdpMid) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
 
   if (!object->_iceCandidate->sdp_mid().length()) {
     info.GetReturnValue().SetNull();
@@ -147,63 +145,55 @@ NAN_GETTER(RTCIceCandidate::GetSdpMid) {
 }
 
 NAN_GETTER(RTCIceCandidate::GetSdpMLineIndex) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
 
   info.GetReturnValue().Set(object->_iceCandidate->sdp_mline_index());
 }
 
 NAN_GETTER(RTCIceCandidate::GetFoundation) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(LOCAL_STRING(cand.foundation()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetPriority) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(cand.priority());
 }
 
 NAN_GETTER(RTCIceCandidate::GetIp) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(LOCAL_STRING(cand.address().ipaddr().ToString()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetProtocol) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(LOCAL_STRING(cand.protocol()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetPort) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(cand.address().port());
 }
 
 NAN_GETTER(RTCIceCandidate::GetType) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   info.GetReturnValue().Set(LOCAL_STRING(cand.type()));
 }
 
 NAN_GETTER(RTCIceCandidate::GetTcpType) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
   const std::string &tcptype = cand.tcptype();
 
@@ -216,8 +206,7 @@ NAN_GETTER(RTCIceCandidate::GetTcpType) {
 }
 
 NAN_GETTER(RTCIceCandidate::GetRelatedAddress) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   if (!strcmp(cricket::LOCAL_PORT_TYPE, cand.type().c_str()) ||
@@ -231,8 +220,7 @@ NAN_GETTER(RTCIceCandidate::GetRelatedAddress) {
 }
 
 NAN_GETTER(RTCIceCandidate::GetRelatedPort) {
-  RTCIceCandidate *object = Nan::ObjectWrap::Unwrap<RTCIceCandidate>(
-      info.This());
+  UNWRAP_OBJECT(RTCIceCandidate, object);
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
   if (!strcmp(cricket::LOCAL_PORT_TYPE, cand.type().c_str()) ||

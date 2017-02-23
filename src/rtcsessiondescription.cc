@@ -96,16 +96,14 @@ NAN_METHOD(RTCSessionDescription::New) {
 }
 
 NAN_GETTER(RTCSessionDescription::GetType) {
-  RTCSessionDescription *object =
-      Nan::ObjectWrap::Unwrap<RTCSessionDescription>(info.This());
+  UNWRAP_OBJECT(RTCSessionDescription, object);
 
   info.GetReturnValue().Set(LOCAL_STRING(object->_sessionDescription->type()));
 }
 
 NAN_GETTER(RTCSessionDescription::GetSdp) {
+  UNWRAP_OBJECT(RTCSessionDescription, object);
   std::string sdp;
-  RTCSessionDescription *object =
-      Nan::ObjectWrap::Unwrap<RTCSessionDescription>(info.This());
 
   object->_sessionDescription->ToString(&sdp);
   info.GetReturnValue().Set(LOCAL_STRING(sdp));

@@ -111,4 +111,7 @@
 #define IS_STRICTLY_NULL(V) \
   (V->IsNull() || V->IsUndefined())
 
+#define UNWRAP_OBJECT(T, O) \
+    T *O = Nan::ObjectWrap::Unwrap<T>(info.This())
+
 #endif  // COMMON_H_
