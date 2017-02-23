@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <cstring>
 #include <memory>
 #include <iostream>
 #include "common.h"
@@ -66,10 +67,10 @@ NAN_METHOD(RTCSessionDescription::New) {
   ASSERT_OBJECT_PROPERTY(descriptionInitDict, kType, typeVal);
   ASSERT_PROPERTY_STRING(kType, typeVal, type);
 
-  if (std::string(kAnswer).compare(*type) &&
-      std::string(kOffer).compare(*type) &&
-      std::string(kPranswer).compare(*type) &&
-      std::string(kRollback).compare(*type)) {
+  if (strcmp(kAnswer, *type) &&
+      strcmp(kOffer, *type) &&
+      strcmp(kPranswer, *type) &&
+      strcmp(kRollback, *type)) {
     errorStream << "The provided value '";
     errorStream << std::string(*type);
     errorStream << "' is not a valid enum value of type RTCSdpType.";

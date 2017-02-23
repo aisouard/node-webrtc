@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <cstring>
 #include <memory>
 #include <iostream>
 #include <webrtc/p2p/base/candidate.h>
@@ -219,7 +220,7 @@ NAN_GETTER(RTCIceCandidate::GetRelatedAddress) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  if (!std::string(cricket::LOCAL_PORT_TYPE).compare(cand.type()) ||
+  if (!strcmp(cricket::LOCAL_PORT_TYPE, cand.type().c_str()) ||
       cand.related_address().IsNil()) {
     info.GetReturnValue().SetNull();
     return;
@@ -234,7 +235,7 @@ NAN_GETTER(RTCIceCandidate::GetRelatedPort) {
       info.This());
   const cricket::Candidate &cand = object->_iceCandidate->candidate();
 
-  if (!std::string(cricket::LOCAL_PORT_TYPE).compare(cand.type()) ||
+  if (!strcmp(cricket::LOCAL_PORT_TYPE, cand.type().c_str()) ||
       cand.related_address().IsNil()) {
     info.GetReturnValue().SetNull();
     return;
