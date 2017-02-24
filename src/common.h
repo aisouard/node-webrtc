@@ -76,12 +76,12 @@
   }
 
 #define ASSERT_OBJECT_ARGUMENT(I, N) \
-  if (!info[0]->IsObject()) { \
+  if (!info[I]->IsObject()) { \
     errorStream << ERROR_ARGUMENT_NOT_OBJECT(I + 1, #N); \
     return Nan::ThrowTypeError(errorStream.str().c_str()); \
   } \
   \
-  Local<Object> N = info[0]->ToObject();
+  Local<Object> N = info[I]->ToObject();
 
 #define ASSERT_OBJECT_PROPERTY(O, P, V) \
   if (!Nan::HasOwnProperty(O, Nan::New(P).ToLocalChecked()).FromJust()) { \
