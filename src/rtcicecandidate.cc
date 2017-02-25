@@ -81,7 +81,7 @@ RTCIceCandidate::~RTCIceCandidate() {
 }
 
 NAN_METHOD(RTCIceCandidate::New) {
-  CONSTRUCTOR_HEADER(RTCIceCandidate)
+  CONSTRUCTOR_HEADER("RTCIceCandidate")
 
   ASSERT_CONSTRUCT_CALL;
 

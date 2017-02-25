@@ -24,7 +24,7 @@
   "Class constructors cannot be invoked without 'new'"
 
 #define ERROR_CONSTRUCT_PREFIX(NAME) \
-  "Failed to construct '" #NAME "': "
+  "Failed to construct '" NAME "': "
 
 #define ERROR_NOT_SINGLE_ARGUMENT(COUNT) \
   "1 argument required, but only " << COUNT << " present."
