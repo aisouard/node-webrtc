@@ -16,12 +16,14 @@
 
 #include <nan.h>
 #include "globals.h"
+#include "rtccertificate.h"
 #include "rtcicecandidate.h"
 #include "rtcsessiondescription.h"
 
 NAN_MODULE_INIT(Init) {
   Globals::Init();
 
+  RTCCertificate::Init(target);
   RTCIceCandidate::Init(target);
   RTCSessionDescription::Init(target);
 
