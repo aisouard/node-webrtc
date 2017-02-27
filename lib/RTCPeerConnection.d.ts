@@ -3,17 +3,94 @@
 // Definitions by: Axel Isouard <axel@isouard.fr>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-interface RTCDtlsFingerprint {
-    algorithm: string;
-    value: string;
+type RTCIceCredentialType = 'password' | 'token';
+
+interface RTCIceServer {
+    urls: string | string[];
+    username: string;
+    credential: string;
+    credentialType: RTCIceCredentialType;
 }
 
-interface RTCCertificate {
-    readonly expires: number;
-    readonly fingerprints: RTCDtlsFingerprint[];
-    getAlgorithm(): AlgorithmIdentifier;
+type RTCIceTransportPolicy = 'relay' | 'all';
+type RTCBundlePolicy = 'balanced' | 'max-compat' | 'max-bundle';
+type RTCRtcpMuxPolicy = 'negotiate' | 'require';
+
+/*interface RTCConfiguration {
+    iceServers: RTCIceServer[];
+    iceTransportPolicy: RTCIceTransportPolicy;
+    bundlePolicy: RTCBundlePolicy;
+    rtcpMuxPolicy: RTCRtcpMuxPolicy;
+    peerIdentity: string;
+    certificates: RTCCertificate[];
+    iceCandidatePoolSize: number;
 }
+
+interface RTCDataChannelEventInit extends EventInit {
+    channel: RTCDataChannel;
+}
+
+class RTCDataChannelEvent extends Event {
+    constructor (type: string, eventInitDict: RTCDataChannelEventInit);
+
+    readonly channel: RTCDataChannel;
+}
+
+interface RTCPeerConnectionIceEventInit extends EventInit {
+    candidate?: RTCIceCandidate;
+    url?: string;
+}
+
+class RTCPeerConnectionIceEvent extends Event {
+    constructor (type: string, eventInitDict: RTCPeerConnectionIceEventInit);
+
+    readonly candidate?: RTCIceCandidate;
+    readonly url?: string;
+}
+
+interface RTCPeerConnectionIceErrorEventInit extends EventInit {
+    hostCandidate: string;
+    url: string;
+    errorCode: number;
+    statusText: string;
+}
+
+class RTCPeerConnectionIceErrorEvent extends Event {
+    constructor (type: string, eventInitDict: RTCPeerConnectionIceErrorEventInit);
+
+    readonly hostCandidate: string;
+    readonly url: string;
+    readonly errorCode: number;
+    readonly statusText: string;
+}
+
+interface RTCTrackEventInit extends EventInit {
+    receiver: RTCRtpReceiver;
+    track: MediaStreamTrack;
+    streams: MediaStream[];
+    transceiver: RTCRtpTransceiver;
+}
+
+class RTCTrackEvent extends Event {
+    readonly receiver: RTCRtpReceiver;
+    readonly track: MediaStreamTrack;
+    readonly streams: MediaStream[];
+    readonly transceiver: RTCRtpTransceiver;
+}*/
 
 class RTCPeerConnection {
+    // constructor (configuration?: RTCConfiguration);
+
     static generateCertificate(keygenAlgorithm: AlgorithmIdentifier): Promise<RTCCertificate>;
+
+    /*onconnectionstatechange: Event;
+    ondatachannel: RTCDataChannelEvent;
+    onicecandidate: RTCPeerConnectionIceEvent;
+    onicecandidateerror: RTCPeerConnectionIceErrorEvent;
+    oniceconnectionstatechange: Event;
+    onicegatheringstatechange: Event;
+    onisolationchange: Event;
+    onnegotiationneeded: Event;
+    onsignalingstatechange: Event;
+    ontrack: RTCTrackEvent;*/
 }
