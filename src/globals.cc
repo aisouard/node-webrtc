@@ -26,6 +26,7 @@
 
 rtc::Thread *Globals::_signalingThread = NULL;
 rtc::Thread *Globals::_workerThread = NULL;
+rtc::RTCCertificateGenerator *Globals::_certificateGenerator = NULL;
 webrtc::PeerConnectionFactoryInterface *Globals::_peerConnectionFactory = NULL;
 
 bool Globals::Init() {
@@ -53,6 +54,9 @@ bool Globals::Init() {
     Nan::ThrowError("Failed to set the current thread.");
   }
 
+  _certificateGenerator =
+      new rtc::RTCCertificateGenerator(_signalingThread, _workerThread);
+
   _peerConnectionFactory =
       webrtc::CreatePeerConnectionFactory(_signalingThread,
                                           _workerThread,
@@ -68,6 +72,8 @@ bool Globals::Update() {
 void Globals::Cleanup(void* args) {
   _peerConnectionFactory->Release();
   _peerConnectionFactory = NULL;
+
+  delete _certificateGenerator;
 
   _signalingThread->SetAllowBlockingCalls(true);
   _signalingThread->Stop();
@@ -94,6 +100,10 @@ rtc::Thread *Globals::GetSignalingThread() {
 
 rtc::Thread *Globals::GetWorkerThread() {
   return _workerThread;
+}
+
+rtc::RTCCertificateGenerator *Globals::GetCertificateGenerator() {
+  return _certificateGenerator;
 }
 
 webrtc::PeerConnectionFactoryInterface *Globals::GetPeerConnectionFactory() {

@@ -28,11 +28,13 @@ class Globals {
 
   static rtc::Thread *GetSignalingThread();
   static rtc::Thread *GetWorkerThread();
+  static rtc::RTCCertificateGenerator *GetCertificateGenerator();
   static webrtc::PeerConnectionFactoryInterface *GetPeerConnectionFactory();
 
  private:
   static rtc::Thread *_signalingThread;
   static rtc::Thread *_workerThread;
+  static rtc::RTCCertificateGenerator *_certificateGenerator;
   static webrtc::PeerConnectionFactoryInterface *_peerConnectionFactory;
 };
 
