@@ -43,10 +43,8 @@ RTCCertificate::~RTCCertificate() {
 
 Local<Object> RTCCertificate::Create(
     const rtc::scoped_refptr<rtc::RTCCertificate>& certificate) {
-  const unsigned argc = 0;
-  Local<Value> argv[argc] = { };
   Local<Function> cons = Nan::New(RTCCertificate::constructor());
-  Local<Object> instance = cons->NewInstance(argc, argv);
+  Local<Object> instance = cons->NewInstance(0, NULL);
 
   RTCCertificate *rtcCertificate = new RTCCertificate(certificate);
   rtcCertificate->Wrap(instance);
