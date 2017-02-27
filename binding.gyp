@@ -7,6 +7,7 @@
                 'src/globals.cc',
                 'src/rtccertificate.cc',
                 'src/rtcicecandidate.cc',
+                'src/rtcpeerconnection.cc',
                 'src/rtcsessiondescription.cc',
             ],
             'include_dirs' : [

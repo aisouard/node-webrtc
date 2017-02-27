@@ -18,6 +18,7 @@
 #include "globals.h"
 #include "rtccertificate.h"
 #include "rtcicecandidate.h"
+#include "rtcpeerconnection.h"
 #include "rtcsessiondescription.h"
 
 NAN_MODULE_INIT(Init) {
@@ -25,6 +26,7 @@ NAN_MODULE_INIT(Init) {
 
   RTCCertificate::Init(target);
   RTCIceCandidate::Init(target);
+  RTCPeerConnection::Init(target);
   RTCSessionDescription::Init(target);
 
   node::AtExit(Globals::Cleanup);
