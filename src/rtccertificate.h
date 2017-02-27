@@ -27,6 +27,8 @@ class RTCCertificate : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init);
 
+  static NAN_GETTER(GetExpires);
+
   static Local<Object> Create(
       const rtc::scoped_refptr<rtc::RTCCertificate>& certificate);
 

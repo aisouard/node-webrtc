@@ -20,10 +20,15 @@
 
 static const char sRTCCertificate[] = "RTCCertificate";
 
+static const char kExpires[] = "expires";
+
 NAN_MODULE_INIT(RTCCertificate::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
   ctor->SetClassName(LOCAL_STRING(sRTCCertificate));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
+
+  Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
+  Nan::SetAccessor(tpl, LOCAL_STRING(kExpires), GetExpires);
 
   constructor().Reset(Nan::GetFunction(ctor).ToLocalChecked());
 }
@@ -52,3 +57,9 @@ Local<Object> RTCCertificate::Create(
 NAN_METHOD(RTCCertificate::New) {
 }
 
+NAN_GETTER(RTCCertificate::GetExpires) {
+  UNWRAP_OBJECT(RTCCertificate, object);
+
+  info.GetReturnValue().Set(
+      static_cast<double>(object->_certificate->Expires()));
+}
