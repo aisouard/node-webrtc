@@ -26,14 +26,23 @@
 #define ERROR_CONSTRUCT_PREFIX(NAME) \
   "Failed to construct '" NAME "': "
 
+#define ERROR_CALL_PREFIX(CLASS, METHOD) \
+  "Failed to execute '" METHOD "' on '" CLASS "': "
+
 #define ERROR_NOT_SINGLE_ARGUMENT(COUNT) \
   "1 argument required, but only " << COUNT << " present."
 
 #define ERROR_NOT_ENOUGH_ARGUMENTS(I, COUNT) \
   I << " arguments required, but only " << COUNT << " present."
 
+#define ERROR_PROPERTY_NOT_A_NUMBER(NAME) \
+  "The '" << NAME << "' property is not a number."
+
 #define ERROR_PROPERTY_NOT_STRING(NAME) \
   "The '" << NAME << "' property is not a string, or is empty."
+
+#define ERROR_PROPERTY_NOT_UINT8ARRAY(NAME) \
+  "The '" << NAME << "' property is not a Uint8Array."
 
 #define ERROR_PROPERTY_NOT_DEFINED(NAME) \
   "The '" << NAME << "' property is undefined."
@@ -46,15 +55,17 @@
   LOG(LS_INFO) << __PRETTY_FUNCTION__; \
   std::stringstream errorStream; \
   errorStream << ERROR_CONSTRUCT_PREFIX(NAME);
-#define METHOD_HEADER(NAME) \
+#define METHOD_HEADER(CLASS, METHOD) \
   LOG(LS_INFO) << __PRETTY_FUNCTION__; \
-  std::stringstream errorStream;
+  std::stringstream errorStream; \
+  errorStream << ERROR_CALL_PREFIX(CLASS, METHOD);
 #else
 #define CONSTRUCTOR_HEADER(NAME) \
   std::stringstream errorStream; \
   errorStream << ERROR_CONSTRUCT_PREFIX(NAME);
-#define METHOD_HEADER(NAME) \
-  std::stringstream errorStream;
+#define METHOD_HEADER(CLASS, METHOD) \
+  std::stringstream errorStream; \
+  errorStream << ERROR_CALL_PREFIX(CLASS, METHOD);
 #endif
 
 #define ASSERT_CONSTRUCT_CALL \
@@ -67,6 +78,14 @@
   if (info.Length() < 1) { \
     errorStream << ERROR_NOT_SINGLE_ARGUMENT(info.Length()); \
     return Nan::ThrowError(errorStream.str().c_str()); \
+  }
+
+#define ASSERT_REJECT_SINGLE_ARGUMENT \
+  if (info.Length() < 1) { \
+    errorStream << ERROR_NOT_SINGLE_ARGUMENT(info.Length()); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
   }
 
 #define ASSERT_ARGUMENTS_COUNT(I) \
@@ -83,6 +102,16 @@
   \
   Local<Object> N = info[I]->ToObject();
 
+#define ASSERT_REJECT_OBJECT_ARGUMENT(I, N) \
+  if (!info[I]->IsObject()) { \
+    errorStream << ERROR_ARGUMENT_NOT_OBJECT(I + 1, #N); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  Local<Object> N = info[I]->ToObject();
+
 #define ASSERT_OBJECT_PROPERTY(O, P, V) \
   if (!Nan::HasOwnProperty(O, Nan::New(P).ToLocalChecked()).FromJust()) { \
     errorStream << ERROR_PROPERTY_NOT_DEFINED(P); \
@@ -90,6 +119,24 @@
   } \
   \
   Local<Value> V = O->Get(Nan::New(P).ToLocalChecked());
+
+#define ASSERT_REJECT_OBJECT_PROPERTY(O, P, V) \
+  if (!Nan::HasOwnProperty(O, Nan::New(P).ToLocalChecked()).FromJust()) { \
+    errorStream << ERROR_PROPERTY_NOT_DEFINED(P); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  Local<Value> V = O->Get(Nan::New(P).ToLocalChecked());
+
+#define ASSERT_PROPERTY_NUMBER(N, V, S) \
+  if (!V->IsNumber()) { \
+    errorStream << ERROR_PROPERTY_NOT_A_NUMBER(N); \
+    return Nan::ThrowTypeError(errorStream.str().c_str()); \
+  } \
+  \
+  Local<Number> S(V->ToNumber());
 
 #define ASSERT_PROPERTY_STRING(N, V, S) \
   if (!V->IsString()) { \
@@ -99,8 +146,43 @@
   \
   String::Utf8Value S(V->ToString());
 
+#define ASSERT_REJECT_PROPERTY_NUMBER(N, V, S) \
+  if (!V->IsNumber()) { \
+    errorStream << ERROR_PROPERTY_NOT_A_NUMBER(N); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  Local<Number> S(V->ToNumber());
+
+#define ASSERT_REJECT_PROPERTY_STRING(N, V, S) \
+  if (!V->IsString()) { \
+    errorStream << ERROR_PROPERTY_NOT_STRING(N); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  String::Utf8Value S(V->ToString());
+
+#define ASSERT_REJECT_PROPERTY_UINT8ARRAY(N, V, S) \
+  if (!V->IsUint8Array()) { \
+    errorStream << ERROR_PROPERTY_NOT_UINT8ARRAY(N); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  Local<Uint8Array> S = V.As<Uint8Array>();
+
 #define DECLARE_OBJECT_PROPERTY(O, P, V) \
   Local<Value> V = O->Get(LOCAL_STRING(P));
+
+#define DECLARE_PROMISE_RESOLVER \
+  Local<Promise::Resolver> resolver = \
+    Promise::Resolver::New(info.GetIsolate()); \
+  info.GetReturnValue().Set(resolver->GetPromise());
 
 #define LOCAL_STRING(S) \
   Nan::New(S).ToLocalChecked()
