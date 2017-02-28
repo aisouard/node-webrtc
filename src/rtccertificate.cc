@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include <iostream>
 #include <webrtc/base/rtccertificate.h>
 #include "rtccertificate.h"
 #include "common.h"
@@ -21,6 +22,9 @@
 static const char sRTCCertificate[] = "RTCCertificate";
 
 static const char kExpires[] = "expires";
+static const char kFingerprints[] = "fingerprints";
+static const char kAlgorithm[] = "algorithm";
+static const char kValue[] = "value";
 
 NAN_MODULE_INIT(RTCCertificate::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
@@ -29,6 +33,7 @@ NAN_MODULE_INIT(RTCCertificate::Init) {
 
   Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
   Nan::SetAccessor(tpl, LOCAL_STRING(kExpires), GetExpires);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kFingerprints), GetFingerprints);
 
   constructor().Reset(Nan::GetFunction(ctor).ToLocalChecked());
 }
@@ -60,4 +65,24 @@ NAN_GETTER(RTCCertificate::GetExpires) {
 
   info.GetReturnValue().Set(
       static_cast<double>(object->_certificate->Expires()));
+}
+
+NAN_GETTER(RTCCertificate::GetFingerprints) {
+  UNWRAP_OBJECT(RTCCertificate, object);
+
+  const rtc::SSLCertificate &sslCertificate =
+      object->_certificate->ssl_certificate();
+  const std::string algorithm =
+      sslCertificate.GetStats()->fingerprint_algorithm;
+  const std::string value =
+      sslCertificate.GetStats()->fingerprint;
+
+  Local<Object> fingerprint = Nan::New<Object>();
+  Local<Array> array = Nan::New<Array>();
+
+  fingerprint->Set(LOCAL_STRING(kAlgorithm), LOCAL_STRING(algorithm));
+  fingerprint->Set(LOCAL_STRING(kValue), LOCAL_STRING(value));
+  array->Set(0, fingerprint);
+
+  info.GetReturnValue().Set(array);
 }

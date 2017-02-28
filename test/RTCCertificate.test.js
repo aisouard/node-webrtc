@@ -22,7 +22,7 @@ const RTCCertificate = require('../').RTCCertificate;
 const RTCPeerConnection = require('../').RTCPeerConnection;
 
 describe('RTCCertificate', () => {
-  describe('generated using RSA algorithm', () => {
+  describe('generated using \'RSASSA-PKCS1-v1_5\' algorithm', () => {
     let certificate;
     const now = (+ new Date());
 
@@ -39,16 +39,42 @@ describe('RTCCertificate', () => {
     });
 
     describe('expire property', () => {
+      it('should be read-only', () => {
+        const value = certificate.expires;
+
+        certificate.expires = 1;
+        assert.equal(certificate.expires, value);
+      });
+
       it('should be 30 days higher than now', () => {
         const expected =
           Math.floor((now + (1000 * 60 * 60 * 24 * 30)) / 1000) * 1000;
 
-        assert.equal(certificate.expires, expected);
+        assert.equal(Math.floor(certificate.expires / 1000) * 1000, expected);
       });
     });
 
-    describe('fingerprints property', () => {
-      it('should be an instance of ')
+    describe('\'fingerprints\' property', () => {
+      it('should be read-only', () => {
+        const fingerprint = certificate.fingerprints[0];
+
+        certificate.fingerprints[0] = {
+          'algorithm': 'null',
+          'value': 'invalid'
+        };
+
+        assert.deepEqual(certificate.fingerprints[0], fingerprint);
+      });
+
+      it('should be an array of objects having \'algorithm\' and \'value\' ' +
+        'properties', () => {
+        const fingerprint = certificate.fingerprints[0];
+
+        assert.property(fingerprint, 'algorithm');
+        assert.property(fingerprint, 'value');
+        assert.typeOf(fingerprint.algorithm, 'string');
+        assert.typeOf(fingerprint.value, 'string');
+      });
     });
   });
 });

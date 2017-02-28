@@ -4,8 +4,8 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
 interface RTCDtlsFingerprint {
-    algorithm: string;
-    value: string;
+    readonly algorithm: string;
+    readonly value: string;
 }
 
 interface RTCCertificate {
