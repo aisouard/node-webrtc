@@ -11,5 +11,5 @@ interface RTCDtlsFingerprint {
 interface RTCCertificate {
     readonly expires: number;
     readonly fingerprints: RTCDtlsFingerprint[];
-    getAlgorithm(): AlgorithmIdentifier;
+    // getAlgorithm(): AlgorithmIdentifier;
 }
