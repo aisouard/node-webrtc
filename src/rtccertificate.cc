@@ -31,9 +31,9 @@ NAN_MODULE_INIT(RTCCertificate::Init) {
   ctor->SetClassName(LOCAL_STRING(sRTCCertificate));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
-  Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
-  Nan::SetAccessor(tpl, LOCAL_STRING(kExpires), GetExpires);
-  Nan::SetAccessor(tpl, LOCAL_STRING(kFingerprints), GetFingerprints);
+  Local<ObjectTemplate> prototype = ctor->PrototypeTemplate();
+  Nan::SetAccessor(prototype, LOCAL_STRING(kExpires), GetExpires);
+  Nan::SetAccessor(prototype, LOCAL_STRING(kFingerprints), GetFingerprints);
 
   constructor().Reset(Nan::GetFunction(ctor).ToLocalChecked());
 }
