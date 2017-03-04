@@ -372,14 +372,13 @@ NAN_METHOD(RTCPeerConnection::GenerateCertificate) {
 
     ASSERT_REJECT_OBJECT_PROPERTY(keygenAlgorithm, kModulusLength,
                                   modulusLengthVal);
-    ASSERT_REJECT_PROPERTY_NUMBER(kModulusLength, modulusLengthVal,
-                                  modulusLength);
+    ASSERT_REJECT_PROPERTY_NUMBER(kModulusLength, modulusLengthVal);
     ASSERT_REJECT_OBJECT_PROPERTY(keygenAlgorithm, kPublicExponent,
                                   publicExponentVal);
     ASSERT_REJECT_PROPERTY_UINT8ARRAY(kPublicExponent, publicExponentVal,
                                       publicExponentArray);
 
-    int modulus = modulusLength->Int32Value();
+    int modulus = modulusLengthVal->Int32Value();
     if (modulus < rtc::kRsaMinModSize || modulus > rtc::kRsaMaxModSize) {
       errorStream << eUnsupported;
 
@@ -408,8 +407,7 @@ NAN_METHOD(RTCPeerConnection::GenerateCertificate) {
                                    + (publicExponent[1] << 8)
                                    + publicExponent[0];
 
-    keyParams = rtc::KeyParams::RSA(modulusLength->Int32Value(),
-                                    publicExponentValue);
+    keyParams = rtc::KeyParams::RSA(modulus, publicExponentValue);
   } else {
     errorStream << eName;
     resolver->Reject(Nan::GetCurrentContext(),

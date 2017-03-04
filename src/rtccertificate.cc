@@ -49,7 +49,7 @@ RTCCertificate::~RTCCertificate() {
 Local<Object> RTCCertificate::Create(
     const rtc::scoped_refptr<rtc::RTCCertificate>& certificate) {
   Local<Function> cons = Nan::New(RTCCertificate::constructor());
-  Local<Object> instance = cons->NewInstance(0, NULL);
+  Local<Object> instance = Nan::NewInstance(cons, 0, NULL).ToLocalChecked();
 
   RTCCertificate *rtcCertificate = new RTCCertificate(certificate);
   rtcCertificate->Wrap(instance);

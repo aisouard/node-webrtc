@@ -61,7 +61,7 @@ Local<Object> RTCSessionDescription::Create(const std::string &type,
 
   const int argc = 1;
   Local<Value> argv[1] = { descriptionInitDict };
-  return cons->NewInstance(argc, argv);
+  return Nan::NewInstance(cons, argc, argv).ToLocalChecked();
 }
 
 NAN_METHOD(RTCSessionDescription::New) {

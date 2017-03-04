@@ -178,15 +178,13 @@
   \
   Local<Boolean> S(V->ToBoolean());
 
-#define ASSERT_REJECT_PROPERTY_NUMBER(N, V, S) \
+#define ASSERT_REJECT_PROPERTY_NUMBER(N, V) \
   if (!V->IsNumber()) { \
     errorStream << ERROR_PROPERTY_NOT_A_NUMBER(N); \
     resolver->Reject(Nan::GetCurrentContext(), \
                      Nan::TypeError(errorStream.str().c_str())); \
     return; \
-  } \
-  \
-  Local<Number> S(V->ToNumber());
+  }
 
 #define ASSERT_REJECT_PROPERTY_STRING(N, V, S) \
   if (!V->IsString()) { \
