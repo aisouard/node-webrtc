@@ -78,8 +78,28 @@ class RTCTrackEvent extends Event {
     readonly transceiver: RTCRtpTransceiver;
 }*/
 
+type RTCSignalingState = 'stable' | 'have-local-offer' | 'have-remote-offer' |
+    'have-local-pranswer' | 'have-remote-pranswer';
+
+type RTCIceGatheringState = 'new' | 'gathering' | 'complete';
+
+type RTCIceConnectionState = 'new' | 'checking' | 'connected' | 'completed' |
+    'failed' | 'disconnected' | 'closed';
+
+type RTCPeerConnectionState = 'new' | 'connecting' | 'connected' |
+    'disconnected' | 'failed' | 'closed';
+
 class RTCPeerConnection {
     // constructor (configuration?: RTCConfiguration);
+
+    readonly currentLocalDescription: RTCSessionDescription;
+    readonly pendingLocalDescription: RTCSessionDescription;
+    readonly currentRemoteDescription: RTCSessionDescription;
+    readonly pendingRemoteDescription: RTCSessionDescription;
+    readonly signalingState: RTCSignalingState;
+    readonly iceGatheringState: RTCIceGatheringState;
+    readonly iceConnectionState: RTCIceConnectionState;
+    readonly connectionState: RTCPeerConnectionState;
 
     static generateCertificate(keygenAlgorithm: AlgorithmIdentifier): Promise<RTCCertificate>;
 

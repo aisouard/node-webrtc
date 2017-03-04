@@ -8,6 +8,7 @@
                 'src/rtccertificate.cc',
                 'src/rtcicecandidate.cc',
                 'src/rtcpeerconnection.cc',
+                'src/rtcpeerconnectionobserver.cc',
                 'src/rtcsessiondescription.cc',
             ],
             'include_dirs' : [

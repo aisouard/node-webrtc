@@ -27,6 +27,108 @@ describe('RTCPeerConnection', () => {
   const errorPrefix = 'Failed to execute \'generateCertificate\' on ' +
     '\'RTCPeerConnection\': ';
 
+  describe('constructor', () => {
+    describe('called with no parameters', () => {
+      const pc = new RTCPeerConnection();
+
+      it('should resolve with a RTCPeerConnection', () => {
+        assert.instanceOf(pc, RTCPeerConnection);
+      });
+    });
+  });
+
+  describe('instance', () => {
+    const pc = new RTCPeerConnection();
+
+    describe('signalingState property', () => {
+      it('should be set to \'stable\'', () => {
+        assert.equal(pc.signalingState, 'stable');
+      });
+
+      it('should be read-only', () => {
+        pc.signalingState = 'another value';
+        assert.equal(pc.signalingState, 'stable');
+      });
+    });
+
+    describe('iceConnectionState property', () => {
+      it('should be set to \'new\'', () => {
+        assert.equal(pc.iceConnectionState, 'new');
+      });
+
+      it('should be read-only', () => {
+        pc.iceConnectionState = 'another value';
+        assert.equal(pc.iceConnectionState, 'new');
+      });
+    });
+
+    describe('iceGatheringState property', () => {
+      it('should be set to \'new\'', () => {
+        assert.equal(pc.iceGatheringState, 'new');
+      });
+
+      it('should be read-only', () => {
+        pc.iceGatheringState = 'another value';
+        assert.equal(pc.iceGatheringState, 'new');
+      });
+    });
+
+    describe('connectionState property', () => {
+      it('should be set to \'new\'', () => {
+        assert.equal(pc.connectionState, 'new');
+      });
+
+      it('should be read-only', () => {
+        pc.connectionState = 'another value';
+        assert.equal(pc.connectionState, 'new');
+      });
+    });
+
+    describe('pendingLocalDescription property', () => {
+      it('should be null', () => {
+        assert.isNull(pc.pendingLocalDescription);
+      });
+
+      it('should be read-only', () => {
+        pc.pendingLocalDescription = 'another value';
+        assert.isNull(pc.pendingLocalDescription);
+      });
+    });
+
+    describe('currentLocalDescription property', () => {
+      it('should be null', () => {
+        assert.isNull(pc.currentLocalDescription);
+      });
+
+      it('should be read-only', () => {
+        pc.currentLocalDescription = 'another value';
+        assert.isNull(pc.currentLocalDescription);
+      });
+    });
+
+    describe('pendingRemoteDescription property', () => {
+      it('should be null', () => {
+        assert.isNull(pc.pendingRemoteDescription);
+      });
+
+      it('should be read-only', () => {
+        pc.pendingRemoteDescription = 'another value';
+        assert.isNull(pc.pendingRemoteDescription);
+      });
+    });
+
+    describe('currentRemoteDescription property', () => {
+      it('should be null', () => {
+        assert.isNull(pc.currentRemoteDescription);
+      });
+
+      it('should be read-only', () => {
+        pc.currentRemoteDescription = 'another value';
+        assert.isNull(pc.currentRemoteDescription);
+      });
+    });
+  });
+
   describe('static method \'generateCertificate\'', () => {
     describe('called with no parameters', () => {
       it('should throw a TypeError', () => {

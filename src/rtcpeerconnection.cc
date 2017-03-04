@@ -17,10 +17,12 @@
 #include <cstring>
 #include <memory>
 #include <iostream>
+#include <webrtc/api/test/fakeconstraints.h>
 #include "common.h"
 #include "globals.h"
 #include "rtccertificate.h"
 #include "rtcpeerconnection.h"
+#include "rtcpeerconnectionobserver.h"
 
 Nan::Persistent<FunctionTemplate> RTCPeerConnection::constructor;
 
@@ -38,6 +40,30 @@ static const char kECDSA[] = "ECDSA";
 static const char kNamedCurve[] = "namedCurve";
 static const char kP256[] = "P-256";
 
+static const char kConnectionState[] = "connectionState";
+static const char kCurrentLocalDescription[] = "currentLocalDescription";
+static const char kCurrentRemoteDescription[] = "currentRemoteDescription";
+static const char kIceConnectionState[] = "iceConnectionState";
+static const char kIceGatheringState[] = "iceGatheringState";
+static const char kPendingLocalDescription[] = "pendingLocalDescription";
+static const char kPendingRemoteDescription[] = "pendingRemoteDescription";
+static const char kSignalingState[] = "signalingState";
+
+static const char kNew[] = "new";
+static const char kChecking[] = "checking";
+static const char kConnected[] = "connected";
+static const char kCompleted[] = "completed";
+static const char kFailed[] = "failed";
+static const char kDisconnected[] = "disconnected";
+static const char kClosed[] = "closed";
+static const char kUnknown[] = "unknown";
+
+static const char kStable[] = "stable";
+static const char kHaveLocalOffer[] = "have-local-offer";
+static const char kHaveLocalPranswer[] = "have-local-pranswer";
+static const char kHaveRemoteOffer[] = "have-remote-offer";
+static const char kHaveRemotePranswer[] = "have-remote-pranswer";
+
 static const char eCurve[] = "EcKeyGenParams: Unrecognized namedCurve";
 static const char eHash[] = "Algorithm: Unrecognized hash";
 static const char eName[] = "Algorithm: Unrecognized name";
@@ -54,17 +80,185 @@ NAN_MODULE_INIT(RTCPeerConnection::Init) {
 
   Nan::SetMethod(ctor, kGenerateCertificate, GenerateCertificate);
 
+  Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
+  Nan::SetAccessor(tpl, LOCAL_STRING(kConnectionState),
+                   GetConnectionState);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kCurrentLocalDescription),
+                   GetCurrentLocalDescription);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kCurrentRemoteDescription),
+                   GetCurrentRemoteDescription);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kIceConnectionState),
+                   GetIceConnectionState);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kIceGatheringState),
+                   GetIceGatheringState);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kPendingLocalDescription),
+                   GetPendingLocalDescription);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kPendingRemoteDescription),
+                   GetPendingRemoteDescription);
+  Nan::SetAccessor(tpl, LOCAL_STRING(kSignalingState),
+                   GetSignalingState);
+
   constructor.Reset(ctor);
   Nan::Set(target, LOCAL_STRING(sRTCPeerConnection), ctor->GetFunction());
 }
 
-RTCPeerConnection::RTCPeerConnection() {
+RTCPeerConnection::RTCPeerConnection(
+    rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection) :
+    _peerConnection(peerConnection) {
 }
 
 RTCPeerConnection::~RTCPeerConnection() {
+  _peerConnection = NULL;
 }
 
 NAN_METHOD(RTCPeerConnection::New) {
+  webrtc::FakeConstraints constraints;
+  webrtc::PeerConnectionInterface::RTCConfiguration config;
+  webrtc::PeerConnectionInterface::IceServer server;
+  server.uri = "stun:stun.l.google.com:19302";
+  config.servers.push_back(server);
+
+  constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                          "true");
+
+  webrtc::PeerConnectionObserver *obs = new RTCPeerConnectionObserver();
+
+  rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection =
+      Globals::GetPeerConnectionFactory()->CreatePeerConnection(
+          config, &constraints, NULL, NULL, obs);
+
+  RTCPeerConnection *rtcPeerConnection = new RTCPeerConnection(peerConnection);
+  rtcPeerConnection->Wrap(info.This());
+
+  info.GetReturnValue().Set(info.This());
+}
+
+NAN_GETTER(RTCPeerConnection::GetConnectionState) {
+  info.GetReturnValue().Set(LOCAL_STRING("new"));
+}
+
+NAN_GETTER(RTCPeerConnection::GetCurrentLocalDescription) {
+  info.GetReturnValue().Set(Nan::Null());
+}
+
+NAN_GETTER(RTCPeerConnection::GetCurrentRemoteDescription) {
+  info.GetReturnValue().Set(Nan::Null());
+}
+
+NAN_GETTER(RTCPeerConnection::GetIceConnectionState) {
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  std::string iceConnectionState;
+  webrtc::PeerConnectionInterface::IceConnectionState state =
+      object->_peerConnection->ice_connection_state();
+
+  switch (state) {
+    case webrtc::PeerConnectionInterface::kIceConnectionNew:
+      iceConnectionState = kNew;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionChecking:
+      iceConnectionState = kChecking;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionConnected:
+      iceConnectionState = kConnected;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionCompleted:
+      iceConnectionState = kCompleted;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionFailed:
+      iceConnectionState = kFailed;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionDisconnected:
+      iceConnectionState = kDisconnected;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceConnectionClosed:
+      iceConnectionState = kClosed;
+      break;
+
+    default:
+      iceConnectionState = kUnknown;
+      break;
+  }
+
+  info.GetReturnValue().Set(LOCAL_STRING(iceConnectionState));
+}
+
+NAN_GETTER(RTCPeerConnection::GetIceGatheringState) {
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  std::string iceGatheringState;
+  webrtc::PeerConnectionInterface::IceGatheringState state =
+      object->_peerConnection->ice_gathering_state();
+
+  switch (state) {
+    case webrtc::PeerConnectionInterface::kIceGatheringNew:
+      iceGatheringState = kNew;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceGatheringGathering:
+      iceGatheringState = kChecking;
+      break;
+
+    case webrtc::PeerConnectionInterface::kIceGatheringComplete:
+      iceGatheringState = kConnected;
+      break;
+
+    default:
+      iceGatheringState = kUnknown;
+      break;
+  }
+
+  info.GetReturnValue().Set(LOCAL_STRING(iceGatheringState));
+}
+
+NAN_GETTER(RTCPeerConnection::GetPendingLocalDescription) {
+  info.GetReturnValue().Set(Nan::Null());
+}
+
+NAN_GETTER(RTCPeerConnection::GetPendingRemoteDescription) {
+  info.GetReturnValue().Set(Nan::Null());
+}
+
+NAN_GETTER(RTCPeerConnection::GetSignalingState) {
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  std::string signalingState;
+  webrtc::PeerConnectionInterface::SignalingState state =
+      object->_peerConnection->signaling_state();
+
+  switch (state) {
+    case webrtc::PeerConnectionInterface::kStable:
+      signalingState = kStable;
+      break;
+
+    case webrtc::PeerConnectionInterface::kHaveLocalOffer:
+      signalingState = kHaveLocalOffer;
+      break;
+
+    case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer:
+      signalingState = kHaveLocalPranswer;
+      break;
+
+    case webrtc::PeerConnectionInterface::kHaveRemoteOffer:
+      signalingState = kHaveRemoteOffer;
+      break;
+
+    case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer:
+      signalingState = kHaveRemotePranswer;
+      break;
+
+    default:
+      signalingState = kUnknown;
+      break;
+  }
+
+  info.GetReturnValue().Set(LOCAL_STRING(signalingState));
 }
 
 RTCPeerConnection::GenerateCertificateWorker::GenerateCertificateWorker

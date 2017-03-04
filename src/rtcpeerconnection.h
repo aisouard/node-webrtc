@@ -28,11 +28,21 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   static NAN_MODULE_INIT(Init);
 
  private:
-  RTCPeerConnection();
+  RTCPeerConnection(
+      rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection);
   ~RTCPeerConnection();
 
   static NAN_METHOD(New);
   static NAN_METHOD(GenerateCertificate);
+
+  static NAN_GETTER(GetConnectionState);
+  static NAN_GETTER(GetCurrentLocalDescription);
+  static NAN_GETTER(GetCurrentRemoteDescription);
+  static NAN_GETTER(GetIceConnectionState);
+  static NAN_GETTER(GetIceGatheringState);
+  static NAN_GETTER(GetPendingLocalDescription);
+  static NAN_GETTER(GetPendingRemoteDescription);
+  static NAN_GETTER(GetSignalingState);
 
   class GenerateCertificateWorker : public Nan::AsyncWorker {
    public:
@@ -50,6 +60,9 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   };
 
   static Nan::Persistent<FunctionTemplate> constructor;
+
+ protected:
+  rtc::scoped_refptr<webrtc::PeerConnectionInterface> _peerConnection;
 };
 
 #endif  // RTCPEERCONNECTION_H_
