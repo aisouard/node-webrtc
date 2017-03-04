@@ -20,8 +20,6 @@
 #include "common.h"
 #include "rtcsessiondescription.h"
 
-Nan::Persistent<FunctionTemplate> RTCSessionDescription::constructor;
-
 static const char sRTCSessionDescription[] = "RTCSessionDescription";
 
 static const char kSdp[] = "sdp";
@@ -34,16 +32,14 @@ static const char kRollback[] = "rollback";
 
 NAN_MODULE_INIT(RTCSessionDescription::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
-
   ctor->SetClassName(LOCAL_STRING(sRTCSessionDescription));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
   Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
-
   Nan::SetAccessor(tpl, LOCAL_STRING(kSdp), GetSdp);
   Nan::SetAccessor(tpl, LOCAL_STRING(kType), GetType);
 
-  constructor.Reset(ctor);
+  constructor().Reset(Nan::GetFunction(ctor).ToLocalChecked());
   Nan::Set(target, LOCAL_STRING(sRTCSessionDescription), ctor->GetFunction());
 }
 
@@ -54,6 +50,18 @@ RTCSessionDescription::RTCSessionDescription(
 
 RTCSessionDescription::~RTCSessionDescription() {
   delete _sessionDescription;
+}
+
+Local<Object> RTCSessionDescription::Create(const std::string &type,
+                                            const std::string &sdp) {
+  Local<Function> cons = Nan::New(RTCSessionDescription::constructor());
+  Local<Object> descriptionInitDict = Nan::New<Object>();
+  descriptionInitDict->Set(LOCAL_STRING(kSdp), LOCAL_STRING(sdp));
+  descriptionInitDict->Set(LOCAL_STRING(kType), LOCAL_STRING(type));
+
+  const int argc = 1;
+  Local<Value> argv[1] = { descriptionInitDict };
+  return cons->NewInstance(argc, argv);
 }
 
 NAN_METHOD(RTCSessionDescription::New) {
