@@ -24,9 +24,6 @@ const RTCPeerConnection = require('../').RTCPeerConnection;
 chai.use(chaiAsPromised);
 
 describe('RTCPeerConnection', () => {
-  const errorPrefix = 'Failed to execute \'generateCertificate\' on ' +
-    '\'RTCPeerConnection\': ';
-
   describe('constructor', () => {
     describe('called with no parameters', () => {
       const pc = new RTCPeerConnection();
@@ -130,6 +127,9 @@ describe('RTCPeerConnection', () => {
   });
 
   describe('static method \'generateCertificate\'', () => {
+    const errorPrefix = 'Failed to execute \'generateCertificate\' on ' +
+      '\'RTCPeerConnection\': ';
+
     describe('called with no parameters', () => {
       it('should throw a TypeError', () => {
         return assert.isRejected(
