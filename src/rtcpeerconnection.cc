@@ -29,13 +29,11 @@ static const char sRTCPeerConnection[] = "RTCPeerConnection";
 static const char kGenerateCertificate[] = "generateCertificate";
 
 static const char kName[] = "name";
-
 static const char kRSA[] = "RSASSA-PKCS1-v1_5";
 static const char kHash[] = "hash";
 static const char kSHA256[] = "SHA-256";
 static const char kModulusLength[] = "modulusLength";
 static const char kPublicExponent[] = "publicExponent";
-
 static const char kECDSA[] = "ECDSA";
 static const char kNamedCurve[] = "namedCurve";
 static const char kP256[] = "P-256";
