@@ -50,7 +50,8 @@ describe('RTCCertificate', () => {
         const expected =
           Math.floor((now + (1000 * 60 * 60 * 24 * 30)) / 1000) * 1000;
 
-        assert.equal(Math.floor(certificate.expires / 1000) * 1000, expected);
+        assert.closeTo(Math.floor(certificate.expires / 1000) * 1000,
+          expected, 1000);
       });
     });
 
