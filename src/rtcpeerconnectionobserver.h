@@ -18,7 +18,6 @@
 #define RTCPEERCONNECTIONOBSERVER_H_
 
 #include <webrtc/api/peerconnectioninterface.h>
-#include <webrtc/api/jsep.h>
 
 class RTCPeerConnectionObserver : public webrtc::PeerConnectionObserver {
  public:
