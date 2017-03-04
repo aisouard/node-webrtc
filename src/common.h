@@ -41,6 +41,9 @@
 #define ERROR_PROPERTY_NOT_STRING(NAME) \
   "The '" << NAME << "' property is not a string, or is empty."
 
+#define ERROR_PROPERTY_NOT_BOOLEAN(NAME) \
+  "The '" << NAME << "' property is not a boolean."
+
 #define ERROR_PROPERTY_NOT_UINT8ARRAY(NAME) \
   "The '" << NAME << "' property is not a Uint8Array."
 
@@ -49,6 +52,9 @@
 
 #define ERROR_ARGUMENT_NOT_OBJECT(INDEX, NAME) \
   "parameter " << INDEX << " ('" << NAME << "') is not an object."
+
+#define ERROR_ARGUMENT_NOT_FUNCTION(INDEX, NAME) \
+  "parameter " << INDEX << " ('" << NAME << "') is not a function."
 
 #ifdef DEBUG
 #define CONSTRUCTOR_HEADER(NAME) \
@@ -102,6 +108,14 @@
   \
   Local<Object> N = info[I]->ToObject();
 
+#define ASSERT_FUNCTION_ARGUMENT(I, N) \
+  if (!info[I]->IsFunction()) { \
+    errorStream << ERROR_ARGUMENT_NOT_FUNCTION(I + 1, #N); \
+    return Nan::ThrowTypeError(errorStream.str().c_str()); \
+  } \
+  \
+  Local<Function> N = info[I].As<v8::Function>();
+
 #define ASSERT_REJECT_OBJECT_ARGUMENT(I, N) \
   if (!info[I]->IsObject()) { \
     errorStream << ERROR_ARGUMENT_NOT_OBJECT(I + 1, #N); \
@@ -145,6 +159,24 @@
   } \
   \
   String::Utf8Value S(V->ToString());
+
+#define ASSERT_PROPERTY_BOOLEAN(N, V, S) \
+  if (!V->IsBoolean()) { \
+    errorStream << ERROR_PROPERTY_NOT_BOOLEAN(N); \
+    return Nan::ThrowTypeError(errorStream.str().c_str()); \
+  } \
+  \
+  Local<Boolean> S(V->ToBoolean());
+
+#define ASSERT_REJECT_PROPERTY_BOOLEAN(N, V, S) \
+  if (!V->IsBoolean()) { \
+    errorStream << ERROR_PROPERTY_NOT_BOOLEAN(N); \
+    resolver->Reject(Nan::GetCurrentContext(), \
+                     Nan::TypeError(errorStream.str().c_str())); \
+    return; \
+  } \
+  \
+  Local<Boolean> S(V->ToBoolean());
 
 #define ASSERT_REJECT_PROPERTY_NUMBER(N, V, S) \
   if (!V->IsNumber()) { \

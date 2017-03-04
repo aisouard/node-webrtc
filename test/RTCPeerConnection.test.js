@@ -20,6 +20,7 @@ const chai = require('chai');
 const assert = chai.assert;
 const chaiAsPromised = require("chai-as-promised");
 const RTCPeerConnection = require('../').RTCPeerConnection;
+const RTCSessionDescription = require('../').RTCSessionDescription;
 
 chai.use(chaiAsPromised);
 
@@ -122,6 +123,106 @@ describe('RTCPeerConnection', () => {
       it('should be read-only', () => {
         pc.currentRemoteDescription = 'another value';
         assert.isNull(pc.currentRemoteDescription);
+      });
+    });
+  });
+
+  describe('createOffer method', () => {
+    const errorPrefix = 'Failed to execute \'createOffer\' on ' +
+      '\'RTCPeerConnection\': ';
+    const pc = new RTCPeerConnection();
+
+    describe('called with no parameters', () => {
+      it('should resolve with a RTCSessionDescription', () => {
+        return assert.eventually.instanceOf(pc.createOffer(),
+          RTCSessionDescription);
+      });
+    });
+
+    describe('called with one parameter', () => {
+      describe('not being an Object', () => {
+        it('should throw a TypeError', () => {
+          return assert.isRejected(
+            pc.createOffer(1.25),
+            TypeError, errorPrefix + 'parameter 1 (\'options\') ' +
+            'is not an object.');
+        });
+      });
+
+      describe('being an Object', () => {
+        it('should resolve with a RTCSessionDescription', () => {
+          return assert.eventually.instanceOf(pc.createOffer({}),
+            RTCSessionDescription);
+        });
+      });
+    });
+
+    describe('called with two parameters', () => {
+      describe('first one not being a Function', () => {
+        it('should throw a TypeError', () => {
+          assert.throw(() => {
+            pc.createOffer(undefined, undefined);
+          }, TypeError, errorPrefix + 'parameter 1 (\'successCallback\') ' +
+            'is not a function.');
+        });
+      });
+
+      describe('second one not being a Function', () => {
+        it('should throw a TypeError', () => {
+          assert.throw(() => {
+            pc.createOffer(() => {}, undefined);
+          }, TypeError, errorPrefix + 'parameter 2 (\'failureCallback\') ' +
+            'is not a function.');
+        });
+      });
+
+      describe('both being functions', () => {
+        it('should call the first callback, ' +
+          'with a RTCSessionDescription as parameter', (done) => {
+          pc.createOffer((desc) => {
+            assert.instanceOf(desc, RTCSessionDescription);
+            done();
+          }, () => {});
+        });
+      });
+    });
+
+    describe('called with three parameters', () => {
+      describe('first one not being an Object', () => {
+        it('should throw a TypeError', () => {
+          assert.throw(() => {
+            pc.createOffer(52, undefined, undefined);
+          }, TypeError, errorPrefix + 'parameter 1 (\'options\') ' +
+            'is not an object.');
+        });
+      });
+
+      describe('second one not being a Function', () => {
+        it('should throw a TypeError', () => {
+          assert.throw(() => {
+            pc.createOffer({}, undefined, undefined);
+          }, TypeError, errorPrefix + 'parameter 2 (\'successCallback\') ' +
+            'is not a function.');
+        });
+      });
+
+      describe('third one not being a Function', () => {
+        it('should throw a TypeError', () => {
+          assert.throw(() => {
+            pc.createOffer({}, () => {}, undefined);
+          }, TypeError, errorPrefix + 'parameter 3 (\'failureCallback\') ' +
+            'is not a function.');
+        });
+      });
+
+      describe('first being an Object, and the others being Functions', () => {
+        it('should call the first callback, ' +
+          'with a RTCSessionDescription as parameter', (done) => {
+          pc.createOffer({}, (desc) => {
+            assert.instanceOf(desc, RTCSessionDescription);
+            done();
+          }, () => {});
+        });
       });
     });
   });

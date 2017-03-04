@@ -33,6 +33,7 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   ~RTCPeerConnection();
 
   static NAN_METHOD(New);
+  static NAN_METHOD(CreateOffer);
   static NAN_METHOD(GenerateCertificate);
 
   static NAN_GETTER(GetConnectionState);

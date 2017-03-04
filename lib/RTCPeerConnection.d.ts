@@ -89,8 +89,16 @@ type RTCIceConnectionState = 'new' | 'checking' | 'connected' | 'completed' |
 type RTCPeerConnectionState = 'new' | 'connecting' | 'connected' |
     'disconnected' | 'failed' | 'closed';
 
+interface RTCOfferOptions {
+    iceRestart: boolean;
+}
+
 class RTCPeerConnection {
     // constructor (configuration?: RTCConfiguration);
+
+    createOffer(options: RTCOfferOptions, successCallback: Function, failureCallback: Function);
+    createOffer(successCallback: Function, failureCallback: Function);
+    createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescription>;
 
     readonly currentLocalDescription: RTCSessionDescription;
     readonly pendingLocalDescription: RTCSessionDescription;

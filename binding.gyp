@@ -7,6 +7,7 @@
                 'src/globals.cc',
                 'src/eventqueue.cc',
                 'src/rtccertificate.cc',
+                'src/rtccreatesessiondescriptionobserver.cc',
                 'src/rtcicecandidate.cc',
                 'src/rtcpeerconnection.cc',
                 'src/rtcpeerconnectionobserver.cc',

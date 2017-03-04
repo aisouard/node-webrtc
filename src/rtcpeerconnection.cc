@@ -21,6 +21,7 @@
 #include "common.h"
 #include "globals.h"
 #include "rtccertificate.h"
+#include "rtccreatesessiondescriptionobserver.h"
 #include "rtcpeerconnection.h"
 #include "rtcpeerconnectionobserver.h"
 
@@ -28,6 +29,7 @@ Nan::Persistent<FunctionTemplate> RTCPeerConnection::constructor;
 
 static const char sRTCPeerConnection[] = "RTCPeerConnection";
 
+static const char kCreateOffer[] = "createOffer";
 static const char kGenerateCertificate[] = "generateCertificate";
 
 static const char kName[] = "name";
@@ -64,6 +66,8 @@ static const char kHaveLocalPranswer[] = "have-local-pranswer";
 static const char kHaveRemoteOffer[] = "have-remote-offer";
 static const char kHaveRemotePranswer[] = "have-remote-pranswer";
 
+static const char kIceRestart[] = "iceRestart";
+
 static const char eCurve[] = "EcKeyGenParams: Unrecognized namedCurve";
 static const char eHash[] = "Algorithm: Unrecognized hash";
 static const char eName[] = "Algorithm: Unrecognized name";
@@ -79,6 +83,9 @@ NAN_MODULE_INIT(RTCPeerConnection::Init) {
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
   Nan::SetMethod(ctor, kGenerateCertificate, GenerateCertificate);
+
+  Local<ObjectTemplate> prototype = ctor->InstanceTemplate();
+  Nan::SetMethod(prototype, kCreateOffer, CreateOffer);
 
   Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
   Nan::SetAccessor(tpl, LOCAL_STRING(kConnectionState),
@@ -131,6 +138,45 @@ NAN_METHOD(RTCPeerConnection::New) {
   rtcPeerConnection->Wrap(info.This());
 
   info.GetReturnValue().Set(info.This());
+}
+
+NAN_METHOD(RTCPeerConnection::CreateOffer) {
+  METHOD_HEADER("RTCPeerConnection", "createOffer");
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  bool iceRestart = false;
+  unsigned char start = 0;
+  rtc::scoped_refptr<webrtc::CreateSessionDescriptionObserver> observer;
+
+  if (info.Length() < 2) {
+    DECLARE_PROMISE_RESOLVER;
+
+    if (info.Length() == 1) {
+      ASSERT_REJECT_OBJECT_ARGUMENT(0, options);
+      DECLARE_OBJECT_PROPERTY(options, kIceRestart, iceRestartVal);
+      iceRestart = iceRestartVal->ToBoolean()->BooleanValue();
+    }
+
+    observer = new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>(
+        new Nan::Persistent<Promise::Resolver>(resolver));
+  } else if (info.Length() > 1) {
+    if (info.Length() > 2) {
+      start = 1;
+
+      ASSERT_OBJECT_ARGUMENT(0, options);
+      DECLARE_OBJECT_PROPERTY(options, kIceRestart, iceRestartVal);
+      iceRestart = iceRestartVal->ToBoolean()->BooleanValue();
+    }
+
+    ASSERT_FUNCTION_ARGUMENT(start, successCallback);
+    ASSERT_FUNCTION_ARGUMENT(start + 1, failureCallback);
+
+    observer = new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>(
+        new Nan::Persistent<Function>(successCallback),
+        new Nan::Persistent<Function>(failureCallback));
+  }
+
+  object->_peerConnection->CreateOffer(observer, NULL);
 }
 
 NAN_GETTER(RTCPeerConnection::GetConnectionState) {
