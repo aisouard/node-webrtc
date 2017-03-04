@@ -16,6 +16,7 @@
 
 #include <uv.h>
 #include <algorithm>
+#include <iterator>
 #include "event.h"
 #include "eventqueue.h"
 
