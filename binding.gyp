@@ -5,6 +5,7 @@
             'sources': [
                 'src/module.cc',
                 'src/globals.cc',
+                'src/eventqueue.cc',
                 'src/rtccertificate.cc',
                 'src/rtcicecandidate.cc',
                 'src/rtcpeerconnection.cc',

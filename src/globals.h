@@ -17,6 +17,7 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
+#include "eventqueue.h"
 #include <webrtc/api/peerconnectioninterface.h>
 #include <webrtc/base/thread.h>
 
@@ -26,12 +27,14 @@ class Globals {
   static bool Update();
   static void Cleanup(void* args);
 
+  static EventQueue *GetEventQueue();
   static rtc::Thread *GetSignalingThread();
   static rtc::Thread *GetWorkerThread();
   static rtc::RTCCertificateGenerator *GetCertificateGenerator();
   static webrtc::PeerConnectionFactoryInterface *GetPeerConnectionFactory();
 
  private:
+  static EventQueue *_eventQueue;
   static rtc::Thread *_signalingThread;
   static rtc::Thread *_workerThread;
   static rtc::RTCCertificateGenerator *_certificateGenerator;

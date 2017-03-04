@@ -24,12 +24,15 @@
 #include <webrtc/base/ssladapter.h>
 #include "globals.h"
 
+EventQueue *Globals::_eventQueue = NULL;
 rtc::Thread *Globals::_signalingThread = NULL;
 rtc::Thread *Globals::_workerThread = NULL;
 rtc::RTCCertificateGenerator *Globals::_certificateGenerator = NULL;
 webrtc::PeerConnectionFactoryInterface *Globals::_peerConnectionFactory = NULL;
 
 bool Globals::Init() {
+  _eventQueue = new EventQueue();
+
 #if WEBRTC_WIN
   rtc::EnsureWinsockInit();
 #endif
@@ -92,6 +95,12 @@ void Globals::Cleanup(void* args) {
   _workerThread = NULL;
 
   rtc::CleanupSSL();
+
+  delete _eventQueue;
+}
+
+EventQueue *Globals::GetEventQueue() {
+  return _eventQueue;
 }
 
 rtc::Thread *Globals::GetSignalingThread() {
