@@ -20,10 +20,10 @@
 #include <webrtc/api/test/fakeconstraints.h>
 #include "common.h"
 #include "globals.h"
+#include "observer/createsessiondescriptionobserver.h"
+#include "observer/peerconnectionobserver.h"
 #include "rtccertificate.h"
-#include "rtccreatesessiondescriptionobserver.h"
 #include "rtcpeerconnection.h"
-#include "rtcpeerconnectionobserver.h"
 
 Nan::Persistent<FunctionTemplate> RTCPeerConnection::constructor;
 
@@ -128,7 +128,7 @@ NAN_METHOD(RTCPeerConnection::New) {
   constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
                           "true");
 
-  webrtc::PeerConnectionObserver *obs = new RTCPeerConnectionObserver();
+  webrtc::PeerConnectionObserver *obs = new PeerConnectionObserver();
 
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection =
       Globals::GetPeerConnectionFactory()->CreatePeerConnection(
@@ -157,7 +157,7 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
       iceRestart = iceRestartVal->ToBoolean()->BooleanValue();
     }
 
-    observer = RTCCreateSessionDescriptionObserver::Create(
+    observer = CreateSessionDescriptionObserver::Create(
         new Nan::Persistent<Promise::Resolver>(resolver));
   } else if (info.Length() > 1) {
     if (info.Length() > 2) {
@@ -171,7 +171,7 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
     ASSERT_FUNCTION_ARGUMENT(start, successCallback);
     ASSERT_FUNCTION_ARGUMENT(start + 1, failureCallback);
 
-    observer = RTCCreateSessionDescriptionObserver::Create(
+    observer = CreateSessionDescriptionObserver::Create(
         new Nan::Persistent<Function>(successCallback),
         new Nan::Persistent<Function>(failureCallback));
   }

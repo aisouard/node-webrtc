@@ -14,45 +14,56 @@
  * limitations under the License.
  */
 
-#include "rtcpeerconnectionobserver.h"
+#include <iostream>
+#include "peerconnectionobserver.h"
 
-RTCPeerConnectionObserver::RTCPeerConnectionObserver() {
+PeerConnectionObserver::PeerConnectionObserver() {
 }
 
-void RTCPeerConnectionObserver::OnSignalingChange(
+void PeerConnectionObserver::OnSignalingChange(
     webrtc::PeerConnectionInterface::SignalingState new_state) {
+  std::cout << "OnSignalingChange" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnAddStream(
+void PeerConnectionObserver::OnAddStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
+  std::cout << "OnAddStream" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnRemoveStream(
+void PeerConnectionObserver::OnRemoveStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
+  std::cout << "OnRemoveStream" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnDataChannel(
+void PeerConnectionObserver::OnDataChannel(
     rtc::scoped_refptr<webrtc::DataChannelInterface> data_channel) {
+  std::cout << "OnDataChannel" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnRenegotiationNeeded() {
+void PeerConnectionObserver::OnRenegotiationNeeded() {
+  std::cout << "OnRenegotiationNeeded" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnIceConnectionChange(
+void PeerConnectionObserver::OnIceConnectionChange(
     webrtc::PeerConnectionInterface::IceConnectionState new_state) {
+  std::cout << "OnIceConnectionChange" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnIceGatheringChange(
+void PeerConnectionObserver::OnIceGatheringChange(
     webrtc::PeerConnectionInterface::IceGatheringState new_state) {
+  std::cout << "OnIceGatheringChange" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnIceCandidate(
+void PeerConnectionObserver::OnIceCandidate(
     const webrtc::IceCandidateInterface *candidate) {
+  std::cout << "OnIceCandidate" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnIceCandidatesRemoved(
+void PeerConnectionObserver::OnIceCandidatesRemoved(
     const std::vector<cricket::Candidate> &candidates) {
+  std::cout << "OnIceCandidatesRemoved" << std::endl;
 }
 
-void RTCPeerConnectionObserver::OnIceConnectionReceivingChange(bool receiving) {
+void PeerConnectionObserver::OnIceConnectionReceivingChange(bool receiving) {
+  std::cout << "OnIceConnectionReceivingChange" << std::endl;
 }

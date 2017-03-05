@@ -17,7 +17,7 @@
 #ifndef GLOBALS_H_
 #define GLOBALS_H_
 
-#include "eventqueue.h"
+#include "event/eventqueue.h"
 #include <webrtc/api/peerconnectioninterface.h>
 #include <webrtc/base/thread.h>
 

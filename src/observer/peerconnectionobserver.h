@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-#ifndef RTCPEERCONNECTIONOBSERVER_H_
-#define RTCPEERCONNECTIONOBSERVER_H_
+#ifndef OBSERVER_PEERCONNECTIONOBSERVER_H_
+#define OBSERVER_PEERCONNECTIONOBSERVER_H_
 
 #include <webrtc/api/peerconnectioninterface.h>
 
-class RTCPeerConnectionObserver : public webrtc::PeerConnectionObserver {
+class PeerConnectionObserver : public webrtc::PeerConnectionObserver {
  public:
-  RTCPeerConnectionObserver();
+  PeerConnectionObserver();
 
   // Triggered when the SignalingState changed.
   void OnSignalingChange(
@@ -62,4 +62,4 @@ class RTCPeerConnectionObserver : public webrtc::PeerConnectionObserver {
   void OnIceConnectionReceivingChange(bool receiving);
 };
 
-#endif  // RTCPEERCONNECTIONOBSERVER_H_
+#endif  // OBSERVER_PEERCONNECTIONOBSERVER_H_

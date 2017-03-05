@@ -3,18 +3,20 @@
         {
             'target_name': 'webrtc',
             'sources': [
-                'src/module.cc',
+                'src/event/createsessiondescriptionevent.cc',
+                'src/event/eventqueue.cc',
                 'src/globals.cc',
-                'src/eventqueue.cc',
+                'src/module.cc',
+                'src/observer/createsessiondescriptionobserver.cc',
+                'src/observer/peerconnectionobserver.cc',
                 'src/rtccertificate.cc',
-                'src/rtccreatesessiondescriptionobserver.cc',
                 'src/rtcicecandidate.cc',
                 'src/rtcpeerconnection.cc',
-                'src/rtcpeerconnectionobserver.cc',
                 'src/rtcsessiondescription.cc',
             ],
             'include_dirs' : [
                 'build/include',
+                'src',
                 '<!(node -e "require(\'nan\')")',
             ],
             'library_dirs': [

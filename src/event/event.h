@@ -14,27 +14,14 @@
  * limitations under the License.
  */
 
-#ifndef EVENTQUEUE_H_
-#define EVENTQUEUE_H_
+#ifndef EVENT_EVENT_H_
+#define EVENT_EVENT_H_
 
-#include <uv.h>
-#include <vector>
-
-class Event;
-class EventQueue {
+class Event {
  public:
-  EventQueue();
-  ~EventQueue();
+  virtual ~Event() {}
 
-  static void AsyncCallback(uv_async_t *handle, int status);
-  static void HandleEvent(Event *event);
-  void PushEvent(Event *event);
-  void Flush();
-
- private:
-  uv_async_t *_async;
-  uv_mutex_t _async_lock;
-  std::vector<Event*> _queue;
+  virtual void Handle() = 0;
 };
 
-#endif  // EVENTQUEUE_H_
+#endif  // EVENT_EVENT_H_

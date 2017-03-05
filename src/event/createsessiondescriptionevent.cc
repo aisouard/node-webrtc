@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-#include <iostream>
-#include "globals.h"
-#include "rtccreatesessiondescriptionobserver.h"
-#include "rtcsessiondescription.h"
 #include "common.h"
+#include "createsessiondescriptionevent.h"
+#include "rtcsessiondescription.h"
 
 using namespace v8;
 
-RTCSessionDescriptionEvent::RTCSessionDescriptionEvent(
+CreateSessionDescriptionEvent::CreateSessionDescriptionEvent(
     Persistent<Function> *successCallback,
     Persistent<Function> *failureCallback) :
     _resolver(NULL),
@@ -30,14 +28,14 @@ RTCSessionDescriptionEvent::RTCSessionDescriptionEvent(
     _failureCallback(failureCallback) {
 }
 
-RTCSessionDescriptionEvent::RTCSessionDescriptionEvent(
+CreateSessionDescriptionEvent::CreateSessionDescriptionEvent(
     Persistent<Promise::Resolver> *resolver) :
     _resolver(resolver),
     _successCallback(NULL),
     _failureCallback(NULL) {
 }
 
-void RTCSessionDescriptionEvent::Handle() {
+void CreateSessionDescriptionEvent::Handle() {
   Nan::HandleScope scope;
 
   if (_resolver) {
@@ -94,54 +92,17 @@ void RTCSessionDescriptionEvent::Handle() {
   delete _failureCallback;
 }
 
-void RTCSessionDescriptionEvent::SetSucceeded(bool succeeded) {
+void CreateSessionDescriptionEvent::SetSucceeded(bool succeeded) {
   _succeeded = succeeded;
 }
 
-void RTCSessionDescriptionEvent::SetErrorMessage(
+void CreateSessionDescriptionEvent::SetErrorMessage(
     const std::string &errorMessage) {
   _errorMessage = errorMessage;
 }
 
-void RTCSessionDescriptionEvent::SetSessionDescription(
+void CreateSessionDescriptionEvent::SetSessionDescription(
     webrtc::SessionDescriptionInterface *sessionDescription) {
   _type = sessionDescription->type();
   sessionDescription->ToString(&_sdp);
-}
-
-RTCCreateSessionDescriptionObserver::RTCCreateSessionDescriptionObserver(
-    Persistent<Promise::Resolver> *resolver) {
-  _event = new RTCSessionDescriptionEvent(resolver);
-}
-
-RTCCreateSessionDescriptionObserver::RTCCreateSessionDescriptionObserver(
-    Persistent<Function> *successCallback,
-    Persistent<Function> *failureCallback) {
-  _event = new RTCSessionDescriptionEvent(successCallback, failureCallback);
-}
-
-void RTCCreateSessionDescriptionObserver::OnSuccess(
-    webrtc::SessionDescriptionInterface *desc) {
-  _event->SetSucceeded(true);
-  _event->SetSessionDescription(desc);
-  Globals::GetEventQueue()->PushEvent(_event);
-}
-
-void RTCCreateSessionDescriptionObserver::OnFailure(const std::string &error) {
-  _event->SetSucceeded(false);
-  _event->SetErrorMessage(error);
-  Globals::GetEventQueue()->PushEvent(_event);
-}
-
-RTCCreateSessionDescriptionObserver *RTCCreateSessionDescriptionObserver::
-  Create(Persistent<Function> *successCallback,
-         Persistent<Function> *failureCallback) {
-  return new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>
-      (successCallback, failureCallback);
-}
-
-RTCCreateSessionDescriptionObserver *RTCCreateSessionDescriptionObserver::
-  Create(Persistent<Promise::Resolver> *resolver) {
-  return new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>
-      (resolver);
 }
