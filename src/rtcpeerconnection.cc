@@ -176,7 +176,11 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
         new Nan::Persistent<Function>(failureCallback));
   }
 
-  object->_peerConnection->CreateOffer(observer, NULL);
+  webrtc::FakeConstraints constraints;
+  constraints.AddOptional(webrtc::MediaConstraintsInterface::kIceRestart,
+                          iceRestart);
+
+  object->_peerConnection->CreateOffer(observer, &constraints);
 }
 
 NAN_GETTER(RTCPeerConnection::GetConnectionState) {
