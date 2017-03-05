@@ -31,6 +31,7 @@ EventQueue::EventQueue() {
 
 EventQueue::~EventQueue() {
   uv_mutex_destroy(&_async_lock);
+  delete _async;
 }
 
 void EventQueue::AsyncCallback(uv_async_t *handle, int status) {
