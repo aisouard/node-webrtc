@@ -61,8 +61,8 @@ bool Globals::Init() {
       new rtc::RTCCertificateGenerator(_signalingThread, _workerThread);
 
   _peerConnectionFactory =
-      webrtc::CreatePeerConnectionFactory(_signalingThread,
-                                          _workerThread,
+      webrtc::CreatePeerConnectionFactory(_workerThread,
+                                          _signalingThread,
                                           NULL, NULL, NULL).release();
 
   return true;
