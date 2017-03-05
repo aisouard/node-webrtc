@@ -28,7 +28,7 @@
     "build": "node-gyp build",
     "build-debug": "node-gyp build --debug",
     "configure": "node-gyp configure",
-    "lint": "python scripts/cpplint.py --root=src --filter=-build/namespace,-build/include src/*",
+    "lint": "python scripts/cpplint.py --root=src --filter=-build/namespace,-build/include src/*.cc src/*.h src/*/*.cc src/*/*.h",
     "install": "node scripts/fetch.js",
     "test": "mocha"
   },
