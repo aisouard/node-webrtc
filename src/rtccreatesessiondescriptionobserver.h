@@ -49,17 +49,24 @@ class RTCSessionDescriptionEvent : public Event {
 class RTCCreateSessionDescriptionObserver :
     public webrtc::CreateSessionDescriptionObserver {
  public:
-  explicit RTCCreateSessionDescriptionObserver(
+  static RTCCreateSessionDescriptionObserver *Create(
       Persistent<Promise::Resolver> *resolver);
-
-  RTCCreateSessionDescriptionObserver(Persistent<Function> *successCallback,
-                                      Persistent<Function> *failureCallback);
+  static RTCCreateSessionDescriptionObserver *Create(
+      Persistent<Function> *successCallback,
+      Persistent<Function> *failureCallback);
 
   void OnSuccess(webrtc::SessionDescriptionInterface* desc);
   void OnFailure(const std::string& error);
 
  private:
   RTCSessionDescriptionEvent *_event;
+
+ protected:
+  explicit RTCCreateSessionDescriptionObserver(
+      Persistent<Promise::Resolver> *resolver);
+
+  RTCCreateSessionDescriptionObserver(Persistent<Function> *successCallback,
+                                      Persistent<Function> *failureCallback);
 };
 
 #endif  // RTCCREATESESSIONDESCRIPTIONOBSERVER_H_

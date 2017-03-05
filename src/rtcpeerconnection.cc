@@ -157,7 +157,7 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
       iceRestart = iceRestartVal->ToBoolean()->BooleanValue();
     }
 
-    observer = new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>(
+    observer = RTCCreateSessionDescriptionObserver::Create(
         new Nan::Persistent<Promise::Resolver>(resolver));
   } else if (info.Length() > 1) {
     if (info.Length() > 2) {
@@ -171,7 +171,7 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
     ASSERT_FUNCTION_ARGUMENT(start, successCallback);
     ASSERT_FUNCTION_ARGUMENT(start + 1, failureCallback);
 
-    observer = new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>(
+    observer = RTCCreateSessionDescriptionObserver::Create(
         new Nan::Persistent<Function>(successCallback),
         new Nan::Persistent<Function>(failureCallback));
   }

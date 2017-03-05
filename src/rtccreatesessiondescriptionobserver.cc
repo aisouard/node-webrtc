@@ -117,3 +117,16 @@ void RTCCreateSessionDescriptionObserver::OnFailure(const std::string &error) {
   _event->SetErrorMessage(error);
   Globals::GetEventQueue()->PushEvent(_event);
 }
+
+RTCCreateSessionDescriptionObserver *RTCCreateSessionDescriptionObserver::
+  Create(Persistent<Function> *successCallback,
+         Persistent<Function> *failureCallback) {
+  return new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>
+      (successCallback, failureCallback);
+}
+
+RTCCreateSessionDescriptionObserver *RTCCreateSessionDescriptionObserver::
+  Create(Persistent<Promise::Resolver> *resolver) {
+  return new rtc::RefCountedObject<RTCCreateSessionDescriptionObserver>
+      (resolver);
+}
