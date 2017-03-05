@@ -18,6 +18,7 @@
 #include "globals.h"
 #include "rtccreatesessiondescriptionobserver.h"
 #include "rtcsessiondescription.h"
+#include "common.h"
 
 using namespace v8;
 
@@ -43,7 +44,14 @@ void RTCSessionDescriptionEvent::Handle() {
     Local<Promise::Resolver> resolver = Nan::New(*_resolver);
 
     if (_succeeded) {
-      resolver->Resolve(RTCSessionDescription::Create(_type, _sdp));
+      Local<Object> descriptionInitDict = Nan::New<Object>();
+
+      descriptionInitDict->Set(LOCAL_STRING(RTCSessionDescription::kSdp),
+                               LOCAL_STRING(_sdp));
+      descriptionInitDict->Set(LOCAL_STRING(RTCSessionDescription::kType),
+                               LOCAL_STRING(_type));
+
+      resolver->Resolve(descriptionInitDict);
     } else {
       resolver->Reject(Nan::Error(_errorMessage.c_str()));
     }
@@ -58,8 +66,15 @@ void RTCSessionDescriptionEvent::Handle() {
     Local<Function> successCallback = Nan::New(*_successCallback);
     Nan::Callback cb(successCallback);
 
+    Local<Object> descriptionInitDict = Nan::New<Object>();
+
+    descriptionInitDict->Set(LOCAL_STRING(RTCSessionDescription::kSdp),
+                             LOCAL_STRING(_sdp));
+    descriptionInitDict->Set(LOCAL_STRING(RTCSessionDescription::kType),
+                             LOCAL_STRING(_type));
+
     const int argc = 1;
-    Local<Value> argv[1] = { RTCSessionDescription::Create(_type, _sdp) };
+    Local<Value> argv[1] = { descriptionInitDict };
 
     cb.Call(argc, argv);
   } else if (!_succeeded && _failureCallback) {

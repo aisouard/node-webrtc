@@ -96,9 +96,16 @@ interface RTCOfferOptions {
 class RTCPeerConnection {
     // constructor (configuration?: RTCConfiguration);
 
-    createOffer(options: RTCOfferOptions, successCallback: Function, failureCallback: Function);
-    createOffer(successCallback: Function, failureCallback: Function);
-    createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescription>;
+    createOffer(options: RTCOfferOptions,
+                successCallback:
+                    (descriptionInitDict: RTCSessionDescriptionInit) => void,
+                failureCallback: (error: Error) => void);
+
+    createOffer(successCallback:
+                    (descriptionInitDict: RTCSessionDescriptionInit) => void,
+                failureCallback: (error: Error) => void);
+
+    createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit>;
 
     readonly currentLocalDescription: RTCSessionDescription;
     readonly pendingLocalDescription: RTCSessionDescription;

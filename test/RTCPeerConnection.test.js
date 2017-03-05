@@ -133,9 +133,17 @@ describe('RTCPeerConnection', () => {
     const pc = new RTCPeerConnection();
 
     describe('called with no parameters', () => {
-      it('should resolve with a RTCSessionDescription', () => {
-        return assert.eventually.instanceOf(pc.createOffer(),
-          RTCSessionDescription);
+      it('should resolve with a descriptionInitDict', (done) => {
+        pc.createOffer()
+          .then((desc) => {
+            assert.isObject(desc);
+            assert.equal(Object.keys(desc).length, 2);
+            assert.property(desc, 'type');
+            assert.typeOf(desc.type, 'string');
+            assert.property(desc, 'sdp');
+            assert.typeOf(desc.sdp, 'string');
+            done();
+          });
       });
     });
 
@@ -150,9 +158,17 @@ describe('RTCPeerConnection', () => {
       });
 
       describe('being an Object', () => {
-        it('should resolve with a RTCSessionDescription', () => {
-          return assert.eventually.instanceOf(pc.createOffer({}),
-            RTCSessionDescription);
+        it('should resolve with a descriptionInitDict', (done) => {
+          pc.createOffer({})
+            .then((desc) => {
+              assert.isObject(desc);
+              assert.equal(Object.keys(desc).length, 2);
+              assert.property(desc, 'type');
+              assert.typeOf(desc.type, 'string');
+              assert.property(desc, 'sdp');
+              assert.typeOf(desc.sdp, 'string');
+              done();
+            });
         });
       });
     });
@@ -178,9 +194,14 @@ describe('RTCPeerConnection', () => {
 
       describe('both being functions', () => {
         it('should call the first callback, ' +
-          'with a RTCSessionDescription as parameter', (done) => {
+          'with a descriptionInitDict as parameter', (done) => {
           pc.createOffer((desc) => {
-            assert.instanceOf(desc, RTCSessionDescription);
+            assert.isObject(desc);
+            assert.equal(Object.keys(desc).length, 2);
+            assert.property(desc, 'type');
+            assert.typeOf(desc.type, 'string');
+            assert.property(desc, 'sdp');
+            assert.typeOf(desc.sdp, 'string');
             done();
           }, () => {});
         });
@@ -217,9 +238,14 @@ describe('RTCPeerConnection', () => {
 
       describe('first being an Object, and the others being Functions', () => {
         it('should call the first callback, ' +
-          'with a RTCSessionDescription as parameter', (done) => {
+          'with a descriptionInitDict as parameter', (done) => {
           pc.createOffer({}, (desc) => {
-            assert.instanceOf(desc, RTCSessionDescription);
+            assert.isObject(desc);
+            assert.equal(Object.keys(desc).length, 2);
+            assert.property(desc, 'type');
+            assert.typeOf(desc.type, 'string');
+            assert.property(desc, 'sdp');
+            assert.typeOf(desc.sdp, 'string');
             done();
           }, () => {});
         });
