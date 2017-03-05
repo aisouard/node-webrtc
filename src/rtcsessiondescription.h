@@ -34,6 +34,14 @@ class RTCSessionDescription : public Nan::ObjectWrap {
     return _constructor;
   }
 
+  static const char kSdp[];
+  static const char kType[];
+
+  static const char kAnswer[];
+  static const char kOffer[];
+  static const char kPranswer[];
+  static const char kRollback[];
+
  private:
   explicit RTCSessionDescription(
       webrtc::SessionDescriptionInterface *sessionDescription);

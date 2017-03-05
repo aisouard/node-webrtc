@@ -22,13 +22,13 @@
 
 static const char sRTCSessionDescription[] = "RTCSessionDescription";
 
-static const char kSdp[] = "sdp";
-static const char kType[] = "type";
+const char RTCSessionDescription::kSdp[] = "sdp";
+const char RTCSessionDescription::kType[] = "type";
 
-static const char kAnswer[] = "answer";
-static const char kOffer[] = "offer";
-static const char kPranswer[] = "pranswer";
-static const char kRollback[] = "rollback";
+const char RTCSessionDescription::kAnswer[] = "answer";
+const char RTCSessionDescription::kOffer[] = "offer";
+const char RTCSessionDescription::kPranswer[] = "pranswer";
+const char RTCSessionDescription::kRollback[] = "rollback";
 
 NAN_MODULE_INIT(RTCSessionDescription::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
