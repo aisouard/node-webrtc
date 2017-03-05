@@ -20,6 +20,10 @@
 PeerConnectionObserver::PeerConnectionObserver() {
 }
 
+PeerConnectionObserver::~PeerConnectionObserver() {
+  _peerConnection = NULL;
+}
+
 void PeerConnectionObserver::OnSignalingChange(
     webrtc::PeerConnectionInterface::SignalingState new_state) {
   std::cout << "OnSignalingChange" << std::endl;
@@ -66,4 +70,13 @@ void PeerConnectionObserver::OnIceCandidatesRemoved(
 
 void PeerConnectionObserver::OnIceConnectionReceivingChange(bool receiving) {
   std::cout << "OnIceConnectionReceivingChange" << std::endl;
+}
+
+PeerConnectionObserver *PeerConnectionObserver::Create() {
+  return new rtc::RefCountedObject<PeerConnectionObserver>();
+}
+
+void PeerConnectionObserver::SetPeerConnection(
+    rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection) {
+  _peerConnection = peerConnection;
 }

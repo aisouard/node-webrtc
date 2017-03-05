@@ -19,9 +19,13 @@
 
 #include <webrtc/api/peerconnectioninterface.h>
 
-class PeerConnectionObserver : public webrtc::PeerConnectionObserver {
+class PeerConnectionObserver : public rtc::RefCountInterface,
+                               public webrtc::PeerConnectionObserver {
  public:
-  PeerConnectionObserver();
+  static PeerConnectionObserver *Create();
+
+  void SetPeerConnection(
+      rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection);
 
   // Triggered when the SignalingState changed.
   void OnSignalingChange(
@@ -60,6 +64,13 @@ class PeerConnectionObserver : public webrtc::PeerConnectionObserver {
 
   // Called when the ICE connection receiving status changes.
   void OnIceConnectionReceivingChange(bool receiving);
+
+ private:
+  rtc::scoped_refptr<webrtc::PeerConnectionInterface> _peerConnection;
+
+ protected:
+  PeerConnectionObserver();
+  ~PeerConnectionObserver();
 };
 
 #endif  // OBSERVER_PEERCONNECTIONOBSERVER_H_

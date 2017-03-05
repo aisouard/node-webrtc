@@ -23,13 +23,15 @@
 
 using namespace v8;
 
+class PeerConnectionObserver;
 class RTCPeerConnection : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init);
 
  private:
-  RTCPeerConnection(
-      rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection);
+  explicit RTCPeerConnection(
+      const webrtc::PeerConnectionInterface::RTCConfiguration& config,
+      const webrtc::MediaConstraintsInterface& constraints);
   ~RTCPeerConnection();
 
   static NAN_METHOD(New);
@@ -64,6 +66,7 @@ class RTCPeerConnection : public Nan::ObjectWrap {
 
  protected:
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> _peerConnection;
+  rtc::scoped_refptr<PeerConnectionObserver> _peerConnectionObserver;
 };
 
 #endif  // RTCPEERCONNECTION_H_

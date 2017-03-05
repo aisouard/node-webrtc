@@ -110,12 +110,18 @@ NAN_MODULE_INIT(RTCPeerConnection::Init) {
 }
 
 RTCPeerConnection::RTCPeerConnection(
-    rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection) :
-    _peerConnection(peerConnection) {
+    const webrtc::PeerConnectionInterface::RTCConfiguration& config,
+    const webrtc::MediaConstraintsInterface& constraints) {
+
+  _peerConnectionObserver = PeerConnectionObserver::Create();
+  _peerConnection = Globals::GetPeerConnectionFactory()->CreatePeerConnection(
+          config, &constraints, NULL, NULL, _peerConnectionObserver);
+  _peerConnectionObserver->SetPeerConnection(_peerConnection);
 }
 
 RTCPeerConnection::~RTCPeerConnection() {
   _peerConnection = NULL;
+  _peerConnectionObserver = NULL;
 }
 
 NAN_METHOD(RTCPeerConnection::New) {
@@ -128,13 +134,8 @@ NAN_METHOD(RTCPeerConnection::New) {
   constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
                           "true");
 
-  webrtc::PeerConnectionObserver *obs = new PeerConnectionObserver();
-
-  rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection =
-      Globals::GetPeerConnectionFactory()->CreatePeerConnection(
-          config, &constraints, NULL, NULL, obs);
-
-  RTCPeerConnection *rtcPeerConnection = new RTCPeerConnection(peerConnection);
+  RTCPeerConnection *rtcPeerConnection = new RTCPeerConnection(config,
+                                                               constraints);
   rtcPeerConnection->Wrap(info.This());
 
   info.GetReturnValue().Set(info.This());
