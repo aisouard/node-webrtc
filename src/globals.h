@@ -24,21 +24,20 @@
 class Globals {
  public:
   static bool Init();
-  static bool Update();
   static void Cleanup(void* args);
 
   static EventQueue *GetEventQueue();
-  static rtc::Thread *GetSignalingThread();
-  static rtc::Thread *GetWorkerThread();
   static rtc::RTCCertificateGenerator *GetCertificateGenerator();
   static webrtc::PeerConnectionFactoryInterface *GetPeerConnectionFactory();
 
  private:
   static EventQueue *_eventQueue;
+  static rtc::Thread *_networkThread;
   static rtc::Thread *_signalingThread;
   static rtc::Thread *_workerThread;
   static rtc::RTCCertificateGenerator *_certificateGenerator;
-  static webrtc::PeerConnectionFactoryInterface *_peerConnectionFactory;
+  static rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+      _peerConnectionFactory;
 };
 
 #endif  // GLOBALS_H_

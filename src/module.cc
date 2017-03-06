@@ -15,6 +15,7 @@
  */
 
 #include <nan.h>
+#include <iostream>
 #include "globals.h"
 #include "rtccertificate.h"
 #include "rtcicecandidate.h"
@@ -22,7 +23,9 @@
 #include "rtcsessiondescription.h"
 
 NAN_MODULE_INIT(Init) {
-  Globals::Init();
+  if (!Globals::Init()) {
+    return;
+  }
 
   RTCCertificate::Init(target);
   RTCIceCandidate::Init(target);
