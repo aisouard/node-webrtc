@@ -30,7 +30,7 @@
     "configure": "node-gyp configure",
     "lint": "python scripts/cpplint.py --root=src --filter=-build/namespace,-build/include src/*.cc src/*.h src/*/*.cc src/*/*.h",
     "install": "node scripts/fetch.js",
-    "test": "mocha"
+    "test": "mocha --recursive"
   },
   "dependencies": {
     "bindings": "^1.2.1",
