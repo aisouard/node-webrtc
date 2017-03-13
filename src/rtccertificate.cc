@@ -25,17 +25,27 @@ static const char kExpires[] = "expires";
 static const char kFingerprints[] = "fingerprints";
 static const char kAlgorithm[] = "algorithm";
 static const char kValue[] = "value";
+static const char kPrivateKey[] = "privateKey";
+static const char kCertificate[] = "certificate";
+static const char kFromPEM[] = "fromPEM";
+static const char kToPEM[] = "toPEM";
 
 NAN_MODULE_INIT(RTCCertificate::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
   ctor->SetClassName(LOCAL_STRING(sRTCCertificate));
   ctor->InstanceTemplate()->SetInternalFieldCount(1);
 
+  Nan::SetMethod(ctor, kFromPEM, FromPEM);
+
   Local<ObjectTemplate> prototype = ctor->PrototypeTemplate();
   Nan::SetAccessor(prototype, LOCAL_STRING(kExpires), GetExpires);
   Nan::SetAccessor(prototype, LOCAL_STRING(kFingerprints), GetFingerprints);
 
+  Nan::SetMethod(prototype, kToPEM, ToPEM);
+
   constructor().Reset(Nan::GetFunction(ctor).ToLocalChecked());
+
+  Nan::Set(target, LOCAL_STRING(sRTCCertificate), ctor->GetFunction());
 }
 
 RTCCertificate::RTCCertificate(
@@ -85,4 +95,36 @@ NAN_GETTER(RTCCertificate::GetFingerprints) {
   array->Set(0, fingerprint);
 
   info.GetReturnValue().Set(array);
+}
+
+NAN_METHOD(RTCCertificate::ToPEM) {
+  METHOD_HEADER("RTCCertificate", "toPEM");
+  UNWRAP_OBJECT(RTCCertificate, object);
+
+  rtc::RTCCertificatePEM _pem = object->_certificate->ToPEM();
+
+  Local<Object> pem = Nan::New<Object>();
+  pem->Set(LOCAL_STRING(kPrivateKey), LOCAL_STRING(_pem.private_key()));
+  pem->Set(LOCAL_STRING(kCertificate), LOCAL_STRING(_pem.certificate()));
+
+  info.GetReturnValue().Set(pem);
+}
+
+NAN_METHOD(RTCCertificate::FromPEM) {
+  METHOD_HEADER("RTCCertificate", "fromPEM");
+
+  ASSERT_SINGLE_ARGUMENT;
+  ASSERT_OBJECT_ARGUMENT(0, pem);
+  ASSERT_OBJECT_PROPERTY(pem, kPrivateKey, privateKeyVal);
+  ASSERT_PROPERTY_STRING(kPrivateKey, privateKeyVal, privateKey);
+
+  ASSERT_OBJECT_PROPERTY(pem, kCertificate, certificateVal);
+  ASSERT_PROPERTY_STRING(kCertificate, certificateVal, certificate);
+
+  rtc::RTCCertificatePEM _pem(*privateKey, *certificate);
+
+  rtc::scoped_refptr<rtc::RTCCertificate> _certificate;
+  _certificate = rtc::RTCCertificate::FromPEM(_pem);
+
+  info.GetReturnValue().Set(RTCCertificate::Create(_certificate));
 }

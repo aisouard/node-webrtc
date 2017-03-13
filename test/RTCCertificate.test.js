@@ -77,5 +77,34 @@ describe('RTCCertificate', () => {
         assert.typeOf(fingerprint.value, 'string');
       });
     });
+
+    describe('\'toPEM\' method', () => {
+      it('should return an object having \'privateKey\' and \'certificate\' ' +
+        'properties', () => {
+          const pem = certificate.toPEM();
+
+          assert.property(pem, 'privateKey');
+          assert.property(pem, 'certificate');
+          assert.typeOf(pem.privateKey, 'string');
+          assert.typeOf(pem.certificate, 'string');
+      });
+    });
+
+    describe('\'fromPEM\' method', () => {
+      it('should return a RTCCertificate', () => {
+          const pem = certificate.toPEM();
+          const certificateFromPEM = RTCCertificate.fromPEM(pem);
+
+          assert.typeOf(certificateFromPEM, 'RTCCertificate');
+      });
+
+      it('should have equals \'fingerprints` and `toPEM()` values', () => {
+          const pem = certificate.toPEM();
+          const certificateFromPEM = RTCCertificate.fromPEM(pem);
+ 
+          assert.deepEqual(certificate.fingerprints, certificateFromPEM.fingerprints);
+          assert.deepEqual(certificate.toPEM(), certificateFromPEM.toPEM());
+      });
+    });
   });
 });

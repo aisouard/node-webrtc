@@ -30,6 +30,9 @@ class RTCCertificate : public Nan::ObjectWrap {
   static NAN_GETTER(GetExpires);
   static NAN_GETTER(GetFingerprints);
 
+  static NAN_METHOD(ToPEM);
+  static NAN_METHOD(FromPEM);
+
   static Local<Object> Create(
       const rtc::scoped_refptr<rtc::RTCCertificate>& certificate);
 
