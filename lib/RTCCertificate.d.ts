@@ -8,7 +8,15 @@ interface RTCDtlsFingerprint {
     readonly value: string;
 }
 
-interface RTCCertificate {
+interface RTCCertificatePEM {
+    privateKey: string;
+    certificate: string;
+}
+
+class RTCCertificate {
+    static fromPEM(pemCertificate: RTCCertificatePEM): RTCCertificate;
+    toPEM(): RTCCertificatePEM;
+
     readonly expires: number;
     readonly fingerprints: RTCDtlsFingerprint[];
     // getAlgorithm(): AlgorithmIdentifier;
