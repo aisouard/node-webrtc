@@ -22,7 +22,7 @@
   },
   "libwebrtc": {
     "url": "https://github.com/aisouard/libwebrtc/releases/download",
-    "version": "0.0.1-rc.4"
+    "version": "1.0.0"
   },
   "scripts": {
     "build": "node-gyp build",

@@ -54,7 +54,7 @@ function fetchLibWebRTC() {
   }
 
   console.log(`Downloading ${fileName}${suffix}...`);
-  download(`${url}/${version}/${fileName}${suffix}`, 'build')
+  download(`${url}/v${version}/${fileName}${suffix}`, 'build')
     .then(function () {
       extractPackage(`./build/${fileName}${suffix}`);
     }).catch(function (err) {
