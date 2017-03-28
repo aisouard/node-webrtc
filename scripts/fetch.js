@@ -44,7 +44,8 @@ function fetchModule() {
 function fetchLibWebRTC() {
   const url = process.env.npm_package_libwebrtc_url;
   const version = process.env.npm_package_libwebrtc_version;
-  const platform = process.platform === 'darwin' ? 'mac' : process.platform;
+  const platform = process.platform === 'darwin' ? 'mac' :
+    (process.platform === 'win32' ? 'win' : process.platform);
   const fileName = `libwebrtc-${version}-${platform}-${process.arch}`;
   const suffix = process.platform === 'win32' ? '.zip' : '.tar.gz';
 
