@@ -38,8 +38,6 @@ bool Globals::Init() {
 
 #if WEBRTC_WIN
   rtc::EnsureWinsockInit();
-  rtc::Win32Thread w32_thread;
-  rtc::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
 #endif
 
   rtc::InitializeSSL();
@@ -54,6 +52,11 @@ bool Globals::Init() {
   if (!_signalingThread->Start() ||
       !_workerThread->Start()) {
     return false;
+  }
+
+  rtc::ThreadManager::Instance()->SetCurrentThread(_signalingThread);
+  if (rtc::ThreadManager::Instance()->CurrentThread() != _signalingThread) {
+    Nan::ThrowError("Failed to set the current thread.");
   }
 
   _certificateGenerator =
