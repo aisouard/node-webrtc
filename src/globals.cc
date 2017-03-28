@@ -16,9 +16,10 @@
 
 #include <nan.h>
 
-#if WEBRTC_WIN
+#ifdef WIN32
 #include <webrtc/base/win32socketinit.h>
 #include <webrtc/base/win32socketserver.h>
+#include <Windows.h>
 #endif
 
 #include <webrtc/base/ssladapter.h>
@@ -26,7 +27,6 @@
 #include "globals.h"
 
 EventQueue *Globals::_eventQueue = NULL;
-rtc::Thread *Globals::_networkThread = NULL;
 rtc::Thread *Globals::_signalingThread = NULL;
 rtc::Thread *Globals::_workerThread = NULL;
 rtc::RTCCertificateGenerator *Globals::_certificateGenerator = NULL;
@@ -38,22 +38,21 @@ bool Globals::Init() {
 
 #if WEBRTC_WIN
   rtc::EnsureWinsockInit();
+  rtc::Win32Thread w32_thread;
+  rtc::ThreadManager::Instance()->SetCurrentThread(&w32_thread);
 #endif
 
   rtc::InitializeSSL();
   rtc::InitRandom(rtc::Time());
 
-  _networkThread = new rtc::Thread();
   _signalingThread = new rtc::Thread();
   _workerThread = new rtc::Thread();
 
-  _networkThread->SetName("network_thread", NULL);
   _signalingThread->SetName("signaling_thread", NULL);
   _workerThread->SetName("worker_thread", NULL);
 
   if (!_signalingThread->Start() ||
-      !_workerThread->Start() ||
-      !_networkThread->Start()) {
+      !_workerThread->Start()) {
     return false;
   }
 
@@ -61,8 +60,8 @@ bool Globals::Init() {
       new rtc::RTCCertificateGenerator(_signalingThread, _workerThread);
 
   _peerConnectionFactory =
-      webrtc::CreatePeerConnectionFactory(_networkThread, _workerThread,
-                                          _signalingThread, NULL, NULL, NULL);
+      webrtc::CreatePeerConnectionFactory(_workerThread, _signalingThread,
+                                          NULL, NULL, NULL);
   return true;
 }
 
@@ -71,15 +70,12 @@ void Globals::Cleanup(void* args) {
 
   delete _certificateGenerator;
 
-  _signalingThread->SetAllowBlockingCalls(true);
-  _signalingThread->Stop();
-
-  _workerThread->SetAllowBlockingCalls(true);
-  _workerThread->Stop();
-
   if (rtc::ThreadManager::Instance()->CurrentThread() == _signalingThread) {
     rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
   }
+
+  _signalingThread->Stop();
+  _workerThread->Stop();
 
   delete _signalingThread;
   delete _workerThread;
@@ -90,6 +86,8 @@ void Globals::Cleanup(void* args) {
   rtc::CleanupSSL();
 
   delete _eventQueue;
+
+  _eventQueue = NULL;
 }
 
 EventQueue *Globals::GetEventQueue() {

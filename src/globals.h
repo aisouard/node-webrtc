@@ -32,7 +32,6 @@ class Globals {
 
  private:
   static EventQueue *_eventQueue;
-  static rtc::Thread *_networkThread;
   static rtc::Thread *_signalingThread;
   static rtc::Thread *_workerThread;
   static rtc::RTCCertificateGenerator *_certificateGenerator;
