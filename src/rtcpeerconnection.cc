@@ -113,8 +113,12 @@ RTCPeerConnection::RTCPeerConnection(
     const webrtc::PeerConnectionInterface::RTCConfiguration& config,
     const webrtc::MediaConstraintsInterface& constraints) {
 
+  _peerConnectionFactory = webrtc::CreatePeerConnectionFactory(
+      Globals::GetSignalingThread(), Globals::GetWorkerThread(),
+      NULL, NULL, NULL);
+
   _peerConnectionObserver = PeerConnectionObserver::Create();
-  _peerConnection = Globals::GetPeerConnectionFactory()->CreatePeerConnection(
+  _peerConnection = _peerConnectionFactory->CreatePeerConnection(
           config, &constraints, NULL, NULL, _peerConnectionObserver);
   _peerConnectionObserver->SetPeerConnection(_peerConnection);
 }
@@ -122,6 +126,7 @@ RTCPeerConnection::RTCPeerConnection(
 RTCPeerConnection::~RTCPeerConnection() {
   _peerConnection = NULL;
   _peerConnectionObserver = NULL;
+  _peerConnectionFactory = NULL;
 }
 
 NAN_METHOD(RTCPeerConnection::New) {

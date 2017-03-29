@@ -65,6 +65,8 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   static Nan::Persistent<FunctionTemplate> constructor;
 
  protected:
+  rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
+      _peerConnectionFactory;
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> _peerConnection;
   rtc::scoped_refptr<PeerConnectionObserver> _peerConnectionObserver;
 };

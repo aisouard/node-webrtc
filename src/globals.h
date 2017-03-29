@@ -28,15 +28,15 @@ class Globals {
 
   static EventQueue *GetEventQueue();
   static rtc::RTCCertificateGenerator *GetCertificateGenerator();
-  static webrtc::PeerConnectionFactoryInterface *GetPeerConnectionFactory();
+  static rtc::Thread *GetSignalingThread();
+  static rtc::Thread *GetWorkerThread();
 
  private:
   static EventQueue *_eventQueue;
   static rtc::Thread *_signalingThread;
   static rtc::Thread *_workerThread;
   static rtc::RTCCertificateGenerator *_certificateGenerator;
-  static rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
-      _peerConnectionFactory;
+  static webrtc::PeerConnectionFactoryInterface *_peerConnectionFactory;
 };
 
 #endif  // GLOBALS_H_

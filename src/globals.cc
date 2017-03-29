@@ -30,8 +30,6 @@ EventQueue *Globals::_eventQueue = NULL;
 rtc::Thread *Globals::_signalingThread = NULL;
 rtc::Thread *Globals::_workerThread = NULL;
 rtc::RTCCertificateGenerator *Globals::_certificateGenerator = NULL;
-rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
-    Globals::_peerConnectionFactory = NULL;
 
 bool Globals::Init() {
   _eventQueue = new EventQueue();
@@ -54,28 +52,14 @@ bool Globals::Init() {
     return false;
   }
 
-  rtc::ThreadManager::Instance()->SetCurrentThread(_signalingThread);
-  if (rtc::ThreadManager::Instance()->CurrentThread() != _signalingThread) {
-    Nan::ThrowError("Failed to set the current thread.");
-  }
-
   _certificateGenerator =
       new rtc::RTCCertificateGenerator(_signalingThread, _workerThread);
 
-  _peerConnectionFactory =
-      webrtc::CreatePeerConnectionFactory(_workerThread, _signalingThread,
-                                          NULL, NULL, NULL);
   return true;
 }
 
 void Globals::Cleanup(void* args) {
-  _peerConnectionFactory = NULL;
-
   delete _certificateGenerator;
-
-  if (rtc::ThreadManager::Instance()->CurrentThread() == _signalingThread) {
-    rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
-  }
 
   _signalingThread->Stop();
   _workerThread->Stop();
@@ -89,7 +73,6 @@ void Globals::Cleanup(void* args) {
   rtc::CleanupSSL();
 
   delete _eventQueue;
-
   _eventQueue = NULL;
 }
 
@@ -101,6 +84,10 @@ rtc::RTCCertificateGenerator *Globals::GetCertificateGenerator() {
   return _certificateGenerator;
 }
 
-webrtc::PeerConnectionFactoryInterface *Globals::GetPeerConnectionFactory() {
-  return _peerConnectionFactory.get();
+rtc::Thread *Globals::GetSignalingThread() {
+  return _signalingThread;
+}
+
+rtc::Thread *Globals::GetWorkerThread() {
+  return _workerThread;
 }
