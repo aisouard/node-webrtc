@@ -4,10 +4,12 @@
             'target_name': 'webrtc',
             'sources': [
                 'src/event/createsessiondescriptionevent.cc',
+                'src/event/setsessiondescriptionevent.cc',
                 'src/event/eventqueue.cc',
                 'src/globals.cc',
                 'src/module.cc',
                 'src/observer/createsessiondescriptionobserver.cc',
+                'src/observer/setsessiondescriptionobserver.cc',
                 'src/observer/peerconnectionobserver.cc',
                 'src/rtccertificate.cc',
                 'src/rtcicecandidate.cc',

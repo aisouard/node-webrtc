@@ -22,14 +22,17 @@
 #include "globals.h"
 #include "observer/createsessiondescriptionobserver.h"
 #include "observer/peerconnectionobserver.h"
+#include "observer/setsessiondescriptionobserver.h"
 #include "rtccertificate.h"
 #include "rtcpeerconnection.h"
+#include "rtcsessiondescription.h"
 
 Nan::Persistent<FunctionTemplate> RTCPeerConnection::constructor;
 
 static const char sRTCPeerConnection[] = "RTCPeerConnection";
 
 static const char kCreateOffer[] = "createOffer";
+static const char kSetLocalDescription[] = "setLocalDescription";
 static const char kGenerateCertificate[] = "generateCertificate";
 
 static const char kName[] = "name";
@@ -86,6 +89,7 @@ NAN_MODULE_INIT(RTCPeerConnection::Init) {
 
   Local<ObjectTemplate> prototype = ctor->InstanceTemplate();
   Nan::SetMethod(prototype, kCreateOffer, CreateOffer);
+  Nan::SetMethod(prototype, kSetLocalDescription, SetLocalDescription);
 
   Local<ObjectTemplate> tpl = ctor->InstanceTemplate();
   Nan::SetAccessor(tpl, LOCAL_STRING(kConnectionState),
@@ -187,6 +191,53 @@ NAN_METHOD(RTCPeerConnection::CreateOffer) {
                           iceRestart);
 
   object->_peerConnection->CreateOffer(observer, &constraints);
+}
+
+NAN_METHOD(RTCPeerConnection::SetLocalDescription) {
+  METHOD_HEADER("RTCPeerConnection", "setLocalDescription");
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  webrtc::SdpParseError error;
+  webrtc::SessionDescriptionInterface *sessionDescription;
+  rtc::scoped_refptr<webrtc::SetSessionDescriptionObserver> observer;
+
+  if (info.Length() == 1) {
+    DECLARE_PROMISE_RESOLVER;
+    ASSERT_REJECT_OBJECT_ARGUMENT(0, description);
+
+    ASSERT_REJECT_OBJECT_PROPERTY(description, RTCSessionDescription::kSdp,
+                                  sdpVal);
+    ASSERT_REJECT_PROPERTY_STRING(RTCSessionDescription::kSdp, sdpVal, sdp);
+
+    ASSERT_REJECT_OBJECT_PROPERTY(description, RTCSessionDescription::kType,
+                                  typeVal);
+    ASSERT_REJECT_PROPERTY_STRING(RTCSessionDescription::kType, typeVal, type);
+
+    if (strcmp(RTCSessionDescription::kAnswer, *type) &&
+        strcmp(RTCSessionDescription::kOffer, *type) &&
+        strcmp(RTCSessionDescription::kPranswer, *type) &&
+        strcmp(RTCSessionDescription::kRollback, *type)) {
+      errorStream << "The provided value '";
+      errorStream << std::string(*type);
+      errorStream << "' is not a valid enum value of type RTCSdpType.";
+      resolver->Reject(Nan::GetCurrentContext(),
+                       Nan::Error(errorStream.str().c_str()));
+      return;
+    }
+
+    sessionDescription = webrtc::CreateSessionDescription(*type, *sdp, &error);
+    if (!sessionDescription) {
+      errorStream << error.description;
+      resolver->Reject(Nan::GetCurrentContext(),
+                       Nan::Error(errorStream.str().c_str()));
+      return;
+    }
+
+    observer = SetSessionDescriptionObserver::Create(
+        new Nan::Persistent<Promise::Resolver>(resolver));
+  }
+
+  // object->_peerConnection->SetLocalDescription(observer, sessionDescription);
 }
 
 NAN_GETTER(RTCPeerConnection::GetConnectionState) {
