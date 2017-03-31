@@ -36,7 +36,6 @@ class RTCPeerConnection : public Nan::ObjectWrap {
 
   static NAN_METHOD(New);
   static NAN_METHOD(CreateOffer);
-  static NAN_METHOD(GenerateCertificate);
 
   static NAN_GETTER(GetConnectionState);
   static NAN_GETTER(GetCurrentLocalDescription);
@@ -46,6 +45,8 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   static NAN_GETTER(GetPendingLocalDescription);
   static NAN_GETTER(GetPendingRemoteDescription);
   static NAN_GETTER(GetSignalingState);
+
+  static NAN_METHOD(GenerateCertificate);
 
   class GenerateCertificateWorker : public Nan::AsyncWorker {
    public:
