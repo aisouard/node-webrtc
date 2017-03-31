@@ -79,7 +79,7 @@ describe('RTCCertificate', () => {
     });
 
     describe('\'toPEM\' method', () => {
-      it('should return an object having \'privateKey\' and \'certificate\' ' +
+      it('should return an object having \'privateKey\' and \'certificate\'' +
         'properties', () => {
           const pem = certificate.toPEM();
 
@@ -87,23 +87,231 @@ describe('RTCCertificate', () => {
           assert.property(pem, 'certificate');
           assert.typeOf(pem.privateKey, 'string');
           assert.typeOf(pem.certificate, 'string');
+
+          assert.include(pem.privateKey, '-----BEGIN PRIVATE KEY-----');
+          assert.include(pem.privateKey, '-----END PRIVATE KEY-----');
+          assert.include(pem.certificate, '-----BEGIN CERTIFICATE-----');
+          assert.include(pem.certificate, '-----END CERTIFICATE-----');
+      });
+    });
+  });
+
+  describe('\'fromPEM\' static method', () => {
+    const errorPrefix = 'Failed to execute \'fromPEM\' on ' +
+      '\'RTCCertificate\': ';
+    let certificateFromPEM;
+
+    describe('called without arguments', () => {
+      it('should throw an Error', () => {
+        assert.throws(() => {
+          RTCCertificate.fromPEM();
+        }, Error, errorPrefix + '1 argument required, but only 0 present.');
       });
     });
 
-    describe('\'fromPEM\' method', () => {
-      it('should return a RTCCertificate', () => {
-          const pem = certificate.toPEM();
-          const certificateFromPEM = RTCCertificate.fromPEM(pem);
-
-          assert.typeOf(certificateFromPEM, 'RTCCertificate');
+    describe('called with a single argument', () => {
+      describe('not being an Object', () => {
+        it('should throw a TypeError', () => {
+          assert.throws(() => {
+            RTCCertificate.fromPEM('');
+          }, TypeError, errorPrefix + 'parameter 1 (\'pemCertificate\') ' +
+            'is not an object.');
+          assert.throws(() => {
+            RTCCertificate.fromPEM(1.26);
+          }, TypeError, errorPrefix + 'parameter 1 (\'pemCertificate\') ' +
+            'is not an object.');
+        });
       });
 
-      it('should have equals \'fingerprints` and `toPEM()` values', () => {
-          const pem = certificate.toPEM();
-          const certificateFromPEM = RTCCertificate.fromPEM(pem);
- 
-          assert.deepEqual(certificate.fingerprints, certificateFromPEM.fingerprints);
-          assert.deepEqual(certificate.toPEM(), certificateFromPEM.toPEM());
+      describe('being an Object', () => {
+        describe('without \'privateKey\' ' +
+          'and \'certificate\' properties', () => {
+          it('should throw a TypeError', () => {
+            assert.throws(() => {
+              RTCCertificate.fromPEM({});
+            }, TypeError, errorPrefix + 'The \'privateKey\' ' +
+              'property is undefined.');
+          });
+        });
+
+        describe('with \'privateKey\' property', () => {
+          describe('not being a String', () => {
+            it('should throw a TypeError', () => {
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: undefined
+                });
+              }, TypeError, errorPrefix + 'The \'privateKey\' ' +
+                'property is not a string, or is empty.');
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: 95
+                });
+              }, TypeError, errorPrefix + 'The \'privateKey\' ' +
+                'property is not a string, or is empty.');
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: []
+                });
+              }, TypeError, errorPrefix + 'The \'privateKey\' ' +
+                'property is not a string, or is empty.');
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: {}
+                });
+              }, TypeError, errorPrefix + 'The \'privateKey\' ' +
+                'property is not a string, or is empty.');
+            });
+          });
+        });
+
+        describe('without \'certificate\' property', () => {
+          it('should throw a TypeError', () => {
+            assert.throws(() => {
+              RTCCertificate.fromPEM({
+                privateKey: 'my private key'
+              });
+            }, TypeError, errorPrefix + 'The \'certificate\' ' +
+              'property is undefined.');
+          });
+        });
+
+        describe('with \'certificate\' property', () => {
+          describe('not being a String', () => {
+            it('should throw a TypeError', () => {
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: 'my private key',
+                  certificate: 1.58
+                });
+              }, TypeError, errorPrefix + 'The \'certificate\' ' +
+                'property is not a string, or is empty.');
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: 'my private key',
+                  certificate: []
+                });
+              }, TypeError, errorPrefix + 'The \'certificate\' ' +
+                'property is not a string, or is empty.');
+              assert.throws(() => {
+                RTCCertificate.fromPEM({
+                  privateKey: 'my private key',
+                  certificate: {}
+                });
+              }, TypeError, errorPrefix + 'The \'certificate\' ' +
+                'property is not a string, or is empty.');
+            });
+          });
+        });
+      });
+    });
+
+    describe('called with an invalid PEM certificate', () => {
+      const privateKey = [
+        '-----BEGIN PRIVATE KEY-----',
+        'MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAPchSTtXMGYyIR/M',
+        '-----END PRIVATE KEY-----',
+        ''
+      ].join('\n');
+
+      const certificate = [
+        '-----BEGIN CERTIFICATE-----',
+        'MIIBnjCCAQegAwIBAgIJAKtOPw6rAgdiMA0GCSqGSIb3DQEBCwUAMBExDzANBgNV',
+        '-----END CERTIFICATE-----',
+        ''
+      ].join('\n');
+
+      it('should throw an Error', () => {
+        assert.throws(() => {
+          RTCCertificate.fromPEM({
+            privateKey: privateKey,
+            certificate: certificate
+          });
+        }, Error, errorPrefix + 'Failed to import the PEM certificate.');
+      });
+    });
+
+    describe('called with a valid PEM certificate', () => {
+      const privateKey = [
+        '-----BEGIN PRIVATE KEY-----',
+        'MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAPchSTtXMGYyIR/M',
+        '8qfHrX4MX7Noz7X3DvXJ8Jl0Ef5Jb7Ujcl8wtUBvHOSzlirNUW+ueZUeySBi93t7',
+        'gpVu3+TTyne5oHQ46j4vpWBnLccfZvUkbO7ZT3wWN3cUjCkOtsLZAwrJcMIiQzjT',
+        'EcYDTyZzC6rhUqTFnFyNRoBP4OQLAgMBAAECgYBSR6bWNwVKQU5+BAKWkgjVetEy',
+        'LqdZclRsyTtuHBMRkum6aX7e6pyuQ1BfZNuOjKWchX69g257dffoCQtFLZElO09F',
+        'Ebg2l3Aksx9EjzdVSB29yKA0wZX3gmJIDmOsNGgq54KhGelF4/V7GZmDoEiCyYeV',
+        'PRmSJI0aNAQ9wEIxoQJBAP4AB26P0sCvnky452VNPpEzX1tndNaXFPoTurAHSRbZ',
+        '8Eff8g/raj8Vq7mmEo/tvix+H9W9xwCm+nQ0/AmwD38CQQD5E2jR4M5WmG9StcG4',
+        'Au1FwQISETFXxXu1M83Xr+Dz6oi0LOXMx/BAtzTJ9kTpK/cy3JY02LAtDo1Oig7B',
+        'zbF1AkB1InBK9Xqcr6CSAyd7GQ9EiOttzJ0eJRhgZ17NtN5o8mKT0tvfqZIau5Sx',
+        'Dbw7scjk3dkyic1PKLIRiym8EfxjAkBSw6lT/EB0M+jh8fVyAL75K75VZJMh2ERY',
+        'HOOsZQv54RgVzsl5d4KU7ovDBGs3k91rcDMVUl+QSUKZM3Td30y1AkEAhipHky7f',
+        'eFiWBWmhVIimULus2E5ofocUUpmuiRVYt6mBCNKuLFkw0gwS+YOeHXBee7+6wRes',
+        'MXgvsg3X0oaowA==',
+        '-----END PRIVATE KEY-----',
+        ''
+      ].join('\n');
+
+      const certificate = [
+        '-----BEGIN CERTIFICATE-----',
+        'MIIBnjCCAQegAwIBAgIJAKtOPw6rAgdiMA0GCSqGSIb3DQEBCwUAMBExDzANBgNV',
+        'BAMMBldlYlJUQzAeFw0xNzAzMTIyMTQxMTNaFw0xNzA0MTIyMTQxMTNaMBExDzAN',
+        'BgNVBAMMBldlYlJUQzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA9yFJO1cw',
+        'ZjIhH8zyp8etfgxfs2jPtfcO9cnwmXQR/klvtSNyXzC1QG8c5LOWKs1Rb655lR7J',
+        'IGL3e3uClW7f5NPKd7mgdDjqPi+lYGctxx9m9SRs7tlPfBY3dxSMKQ62wtkDCslw',
+        'wiJDONMRxgNPJnMLquFSpMWcXI1GgE/g5AsCAwEAATANBgkqhkiG9w0BAQsFAAOB',
+        'gQDfIHsQ5Bv7KmNVjJ5OQBID/Szuhvlookw7YJn3IxTjpaQbaEyyMsUJc3d7IHKL',
+        'zpm9z7qhvaYS5NSQx4zEER3cvQ8pNRGh/dWkR3tVSjGXnx1q/0Fb7OITnl2P9q0q',
+        'yzCNE4CfTda7NjR70xp3wBHeaos9Uj4Dad5soYRbtnSrKQ==',
+        '-----END CERTIFICATE-----',
+        ''
+      ].join('\n');
+
+      const fingerprints = [
+        {
+          algorithm: 'sha-256',
+          value: '5D:DC:92:D8:18:73:99:CB:46:B3:73:D3:5A:7E:5A:42:BF:41:3D:' +
+          'D8:B4:DC:13:B0:81:41:3A:41:BE:F7:FC:EB'
+        }
+      ];
+
+      const expires = 1492033273000;
+
+      certificateFromPEM = RTCCertificate.fromPEM({
+        privateKey: privateKey,
+        certificate: certificate
+      });
+
+      it('should return a RTCCertificate', () => {
+        assert.instanceOf(certificateFromPEM, RTCCertificate);
+      });
+
+      it('should have the same \'fingerprints\' value as provided', () => {
+        assert.deepEqual(fingerprints, certificateFromPEM.fingerprints);
+      });
+
+      it('should have the same \'expires\' value as provided', () => {
+        assert.equal(expires, certificateFromPEM.expires);
+      });
+
+      describe('\'toPEM\' method', () => {
+        describe('called with no argument', () => {
+          let PEMFromCertificate = certificateFromPEM.toPEM();
+
+          it('should return an Object with \'privateKey\' ' +
+            'and \'certificate\' properties', () => {
+            assert.property(PEMFromCertificate, 'privateKey');
+            assert.property(PEMFromCertificate, 'certificate');
+          });
+
+          it('should have the same \'privateKey\' value as provided', () => {
+            assert.equal(privateKey, PEMFromCertificate.privateKey);
+          });
+
+          it('should have the same \'certificate\' value as provided', () => {
+            assert.equal(certificate, PEMFromCertificate.certificate);
+          });
+        });
       });
     });
   });

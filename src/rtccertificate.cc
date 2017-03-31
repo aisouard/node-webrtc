@@ -30,6 +30,9 @@ static const char kCertificate[] = "certificate";
 static const char kFromPEM[] = "fromPEM";
 static const char kToPEM[] = "toPEM";
 
+static const char eImport[] =
+    "Failed to import the PEM certificate.";
+
 NAN_MODULE_INIT(RTCCertificate::Init) {
   Local<FunctionTemplate> ctor = Nan::New<FunctionTemplate>(New);
   ctor->SetClassName(LOCAL_STRING(sRTCCertificate));
@@ -101,11 +104,13 @@ NAN_METHOD(RTCCertificate::ToPEM) {
   METHOD_HEADER("RTCCertificate", "toPEM");
   UNWRAP_OBJECT(RTCCertificate, object);
 
-  rtc::RTCCertificatePEM _pem = object->_certificate->ToPEM();
+  rtc::RTCCertificatePEM rtcCertificatePEM = object->_certificate->ToPEM();
 
   Local<Object> pem = Nan::New<Object>();
-  pem->Set(LOCAL_STRING(kPrivateKey), LOCAL_STRING(_pem.private_key()));
-  pem->Set(LOCAL_STRING(kCertificate), LOCAL_STRING(_pem.certificate()));
+  pem->Set(LOCAL_STRING(kPrivateKey),
+           LOCAL_STRING(rtcCertificatePEM.private_key()));
+  pem->Set(LOCAL_STRING(kCertificate),
+           LOCAL_STRING(rtcCertificatePEM.certificate()));
 
   info.GetReturnValue().Set(pem);
 }
@@ -114,17 +119,22 @@ NAN_METHOD(RTCCertificate::FromPEM) {
   METHOD_HEADER("RTCCertificate", "fromPEM");
 
   ASSERT_SINGLE_ARGUMENT;
-  ASSERT_OBJECT_ARGUMENT(0, pem);
-  ASSERT_OBJECT_PROPERTY(pem, kPrivateKey, privateKeyVal);
+  ASSERT_OBJECT_ARGUMENT(0, pemCertificate);
+  ASSERT_OBJECT_PROPERTY(pemCertificate, kPrivateKey, privateKeyVal);
   ASSERT_PROPERTY_STRING(kPrivateKey, privateKeyVal, privateKey);
 
-  ASSERT_OBJECT_PROPERTY(pem, kCertificate, certificateVal);
+  ASSERT_OBJECT_PROPERTY(pemCertificate, kCertificate, certificateVal);
   ASSERT_PROPERTY_STRING(kCertificate, certificateVal, certificate);
 
-  rtc::RTCCertificatePEM _pem(*privateKey, *certificate);
+  rtc::RTCCertificatePEM rtcCertificatePEM(*privateKey, *certificate);
 
-  rtc::scoped_refptr<rtc::RTCCertificate> _certificate;
-  _certificate = rtc::RTCCertificate::FromPEM(_pem);
+  rtc::scoped_refptr<rtc::RTCCertificate> rtcCertificate =
+      rtc::RTCCertificate::FromPEM(rtcCertificatePEM);
 
-  info.GetReturnValue().Set(RTCCertificate::Create(_certificate));
+  if (!rtcCertificate) {
+    errorStream << eImport;
+    return Nan::ThrowError(errorStream.str().c_str());
+  }
+
+  info.GetReturnValue().Set(RTCCertificate::Create(rtcCertificate));
 }
