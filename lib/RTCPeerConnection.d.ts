@@ -119,6 +119,8 @@ class RTCPeerConnection {
 
     static generateCertificate(keygenAlgorithm: AlgorithmIdentifier): Promise<RTCCertificate>;
 
+    onsignalingstatechange: Event;
+
     /*onconnectionstatechange: Event;
     ondatachannel: RTCDataChannelEvent;
     onicecandidate: RTCPeerConnectionIceEvent;
@@ -127,6 +129,5 @@ class RTCPeerConnection {
     onicegatheringstatechange: Event;
     onisolationchange: Event;
     onnegotiationneeded: Event;
-    onsignalingstatechange: Event;
     ontrack: RTCTrackEvent;*/
 }

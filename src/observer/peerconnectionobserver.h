@@ -17,6 +17,7 @@
 #ifndef OBSERVER_PEERCONNECTIONOBSERVER_H_
 #define OBSERVER_PEERCONNECTIONOBSERVER_H_
 
+#include <nan.h>
 #include <webrtc/api/peerconnectioninterface.h>
 
 class PeerConnectionObserver : public rtc::RefCountInterface,
@@ -65,8 +66,13 @@ class PeerConnectionObserver : public rtc::RefCountInterface,
   // Called when the ICE connection receiving status changes.
   void OnIceConnectionReceivingChange(bool receiving);
 
+  v8::Local<v8::Value> GetOnSignalingStateChange();
+  v8::Local<v8::Value> SetOnSignalingStateChange(v8::Local<v8::Value> value);
+
  private:
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> _peerConnection;
+
+  v8::Persistent<v8::Function> *_onSignalingStateChange;
 
  protected:
   PeerConnectionObserver();

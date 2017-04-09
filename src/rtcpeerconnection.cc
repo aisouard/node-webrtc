@@ -54,6 +54,8 @@ static const char kPendingLocalDescription[] = "pendingLocalDescription";
 static const char kPendingRemoteDescription[] = "pendingRemoteDescription";
 static const char kSignalingState[] = "signalingState";
 
+static const char kOnSignalingStateChange[] = "onsignalingstatechange";
+
 static const char kNew[] = "new";
 static const char kChecking[] = "checking";
 static const char kConnected[] = "connected";
@@ -109,7 +111,11 @@ NAN_MODULE_INIT(RTCPeerConnection::Init) {
   Nan::SetAccessor(tpl, LOCAL_STRING(kSignalingState),
                    GetSignalingState);
 
+  Nan::SetAccessor(tpl, LOCAL_STRING(kOnSignalingStateChange),
+                   GetOnSignalingStateChange, SetOnSignalingStateChange);
+
   constructor.Reset(ctor);
+
   Nan::Set(target, LOCAL_STRING(sRTCPeerConnection), ctor->GetFunction());
 }
 
@@ -237,7 +243,7 @@ NAN_METHOD(RTCPeerConnection::SetLocalDescription) {
         new Nan::Persistent<Promise::Resolver>(resolver));
   }
 
-  // object->_peerConnection->SetLocalDescription(observer, sessionDescription);
+  object->_peerConnection->SetLocalDescription(observer, sessionDescription);
 }
 
 NAN_GETTER(RTCPeerConnection::GetConnectionState) {
@@ -325,7 +331,20 @@ NAN_GETTER(RTCPeerConnection::GetIceGatheringState) {
 }
 
 NAN_GETTER(RTCPeerConnection::GetPendingLocalDescription) {
-  info.GetReturnValue().Set(Nan::Null());
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  const webrtc::SessionDescriptionInterface *sessionDescription =
+      object->_peerConnection->pending_local_description();
+
+  if (!sessionDescription) {
+    info.GetReturnValue().Set(Nan::Null());
+    return;
+  }
+
+  std::string sdp;
+  sessionDescription->ToString(&sdp);
+  info.GetReturnValue().Set(
+      RTCSessionDescription::Create(sessionDescription->type(), sdp));
 }
 
 NAN_GETTER(RTCPeerConnection::GetPendingRemoteDescription) {
@@ -366,6 +385,20 @@ NAN_GETTER(RTCPeerConnection::GetSignalingState) {
   }
 
   info.GetReturnValue().Set(LOCAL_STRING(signalingState));
+}
+
+NAN_GETTER(RTCPeerConnection::GetOnSignalingStateChange) {
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  info.GetReturnValue().Set(
+      object->_peerConnectionObserver->GetOnSignalingStateChange());
+}
+
+NAN_SETTER(RTCPeerConnection::SetOnSignalingStateChange) {
+  UNWRAP_OBJECT(RTCPeerConnection, object);
+
+  info.GetReturnValue().Set(
+      object->_peerConnectionObserver->SetOnSignalingStateChange(value));
 }
 
 RTCPeerConnection::GenerateCertificateWorker::GenerateCertificateWorker

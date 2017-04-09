@@ -36,6 +36,22 @@ SetSessionDescriptionEvent::SetSessionDescriptionEvent(
 }
 
 void SetSessionDescriptionEvent::Handle() {
+  Nan::HandleScope scope;
+
+  if (_resolver) {
+    Local<Promise::Resolver> resolver = Nan::New(*_resolver);
+
+    if (_succeeded) {
+      resolver->Resolve(Nan::Undefined());
+    } else {
+      resolver->Reject(Nan::Error(_errorMessage.c_str()));
+    }
+
+    Isolate::GetCurrent()->RunMicrotasks();
+    _resolver->Reset();
+    delete _resolver;
+    return;
+  }
 }
 
 void SetSessionDescriptionEvent::SetSucceeded(bool succeeded) {

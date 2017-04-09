@@ -42,8 +42,7 @@ SetSessionDescriptionObserver *SetSessionDescriptionObserver::
 
 SetSessionDescriptionObserver *SetSessionDescriptionObserver::
   Create(Persistent<Promise::Resolver> *resolver) {
-  return new rtc::RefCountedObject<SetSessionDescriptionObserver>
-      (resolver);
+  return new rtc::RefCountedObject<SetSessionDescriptionObserver>(resolver);
 }
 
 void SetSessionDescriptionObserver::OnSuccess() {

@@ -16,17 +16,23 @@
 
 'use strict';
 
+const sinon = require('sinon');
 const chai = require('chai');
 const assert = chai.assert;
 const chaiAsPromised = require("chai-as-promised");
 const RTCPeerConnection = require('../../').RTCPeerConnection;
+const RTCSessionDescription = require('../../').RTCSessionDescription;
 
 chai.use(chaiAsPromised);
 
 describe('RTCPeerConnection#setLocalDescription', () => {
   const errorPrefix = 'Failed to execute \'setLocalDescription\' on ' +
     '\'RTCPeerConnection\': ';
-  const pc = new RTCPeerConnection();
+  let pc;
+
+  before(() => {
+    pc = new RTCPeerConnection();
+  });
 
   describe('called with one parameter', () => {
     describe('not being an Object', () => {
@@ -142,6 +148,85 @@ describe('RTCPeerConnection#setLocalDescription', () => {
             'The provided value \'anything\' ' +
             'is not a valid enum value of type RTCSdpType.');
         });
+      });
+
+      describe('with an invalid SDP string', () => {
+        it('should throw a TypeError', () => {
+          const p = pc.setLocalDescription({
+            sdp: 'sdp-here',
+            type: 'offer'
+          });
+
+          assert.instanceOf(p, Promise);
+          return assert.isRejected(p, Error, errorPrefix + 'Expect line: v=');
+        });
+      });
+
+      describe('with a basic offer SDP', () => {
+        const sdp = {
+          sdp: 'v=0\r\no=- 2368977456164643196 5 IN IP4 127.0.0.1\r\n' +
+          's=-\r\nt=0 0\r\na=msid-semantic: WMS\r\n',
+          type: 'offer'
+        };
+
+        before(() => {
+          pc = new RTCPeerConnection();
+          pc.onsignalingstatechange = sinon.spy();
+        });
+
+        it('should resolve', (done) => {
+          const p = pc.setLocalDescription(sdp).then(done);
+          assert.instanceOf(p, Promise);
+        });
+
+        /*
+         * If connection's signaling state changed above, fire a simple event
+         * named signalingstatechange at connection.
+         */
+        it('should call \'onsignalingstatechange\' event callback', () => {
+          assert.equal(pc.onsignalingstatechange.calledOnce, true);
+        });
+
+        /*
+         * If description is of type "offer", set
+         * connection.pendingLocalDescription to description and signaling state
+         * to have-local-offer.
+         */
+        it('should set the \'pendingLocalDescription\' property to the same ' +
+          'passed SDP', () => {
+          assert.instanceOf(pc.pendingLocalDescription, RTCSessionDescription);
+          assert.equal(pc.pendingLocalDescription.sdp, sdp.sdp);
+          assert.equal(pc.pendingLocalDescription.type, sdp.type);
+        });
+
+        it('should set the \'signalingState\' property to ' +
+          '\'have-local-offer\'', () => {
+          assert.equal(pc.signalingState, 'have-local-offer');
+        });
+
+        /*
+         * If description is set as a local description, connection's ICE
+         * gathering state is new
+         */
+        it('should set the \'iceGatheringState\' property to \'new\'', () => {
+          assert.equal(pc.iceGatheringState, 'new');
+        });
+      });
+
+      describe('with a basic answer SDP', () => {
+        const sdp = {
+          sdp: 'v=0\r\no=- 8931616931805276348 2 IN IP4 127.0.0.1\r\n' +
+          's=-\r\nt=0 0\r\na=msid-semantic: WMS\r\n',
+          type: 'answer'
+        };
+
+        before(() => {
+          pc = new RTCPeerConnection();
+        });
+      });
+
+      describe('with a media offer SDP', () => {
+
       });
     });
   });

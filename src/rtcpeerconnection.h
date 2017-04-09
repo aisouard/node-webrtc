@@ -47,6 +47,9 @@ class RTCPeerConnection : public Nan::ObjectWrap {
   static NAN_GETTER(GetPendingRemoteDescription);
   static NAN_GETTER(GetSignalingState);
 
+  static NAN_GETTER(GetOnSignalingStateChange);
+  static NAN_SETTER(SetOnSignalingStateChange);
+
   static NAN_METHOD(GenerateCertificate);
 
   class GenerateCertificateWorker : public Nan::AsyncWorker {

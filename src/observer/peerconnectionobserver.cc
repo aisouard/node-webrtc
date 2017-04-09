@@ -15,18 +15,36 @@
  */
 
 #include <iostream>
+#include "globals.h"
 #include "peerconnectionobserver.h"
+#include "event/signalingchangeevent.h"
+
+using namespace v8;
 
 PeerConnectionObserver::PeerConnectionObserver() {
+  _onSignalingStateChange = NULL;
 }
 
 PeerConnectionObserver::~PeerConnectionObserver() {
+  if (_onSignalingStateChange) {
+    _onSignalingStateChange->Reset();
+    delete _onSignalingStateChange;
+  }
+
   _peerConnection = NULL;
+  _onSignalingStateChange = NULL;
 }
 
 void PeerConnectionObserver::OnSignalingChange(
     webrtc::PeerConnectionInterface::SignalingState new_state) {
-  std::cout << "OnSignalingChange" << std::endl;
+  if (!_onSignalingStateChange) {
+    return;
+  }
+
+  SignalingChangeEvent *event =
+      new SignalingChangeEvent(_onSignalingStateChange);
+
+  Globals::GetEventQueue()->PushEvent(event);
 }
 
 void PeerConnectionObserver::OnAddStream(
@@ -79,4 +97,28 @@ PeerConnectionObserver *PeerConnectionObserver::Create() {
 void PeerConnectionObserver::SetPeerConnection(
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peerConnection) {
   _peerConnection = peerConnection;
+}
+
+Local<Value> PeerConnectionObserver::GetOnSignalingStateChange() {
+  if (!_onSignalingStateChange) {
+    return Nan::Null();
+  }
+
+  return Nan::New(*_onSignalingStateChange);
+}
+
+Local<Value> PeerConnectionObserver::SetOnSignalingStateChange(
+    Local<Value> value) {
+  if (_onSignalingStateChange) {
+    _onSignalingStateChange->Reset();
+    delete _onSignalingStateChange;
+    _onSignalingStateChange = NULL;
+  }
+
+  if (!value->IsFunction()) {
+    return Nan::Null();
+  }
+
+  _onSignalingStateChange = new Nan::Persistent<Function>(value.As<Function>());
+  return Nan::New(*_onSignalingStateChange);
 }
