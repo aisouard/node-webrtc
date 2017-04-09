@@ -5,6 +5,7 @@
             'sources': [
                 'src/event/createsessiondescriptionevent.cc',
                 'src/event/setsessiondescriptionevent.cc',
+                'src/event/signalingchangeevent.cc',
                 'src/event/eventqueue.cc',
                 'src/globals.cc',
                 'src/module.cc',
